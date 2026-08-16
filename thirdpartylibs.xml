@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libraries>
+  <library>
+    <location>vendor/aws/aws-crt-php/</location>
+    <name>AWS Common Runtime for PHP</name>
+    <version>v1.2.7</version>
+    <license>Apache</license>
+    <licenseversion>2.0</licenseversion>
+  </library>
+  <library>
+    <location>vendor/aws/aws-sdk-php/</location>
+    <name>AWS SDK for PHP</name>
+    <version>3.392.3</version>
+    <license>Apache</license>
+    <licenseversion>2.0</licenseversion>
+  </library>
+  <library>
+    <location>vendor/guzzlehttp/guzzle/</location>
+    <name>Guzzle</name>
+    <version>8.0.2</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/guzzlehttp/promises/</location>
+    <name>Guzzle Promises</name>
+    <version>3.0.1</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/guzzlehttp/psr7/</location>
+    <name>Guzzle PSR-7</name>
+    <version>3.0.0</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/mtdowling/jmespath.php/</location>
+    <name>JMESPath PHP</name>
+    <version>2.9.2</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/psr/http-client/</location>
+    <name>PSR HTTP Client</name>
+    <version>1.0.3</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/psr/http-factory/</location>
+    <name>PSR HTTP Factory</name>
+    <version>1.1.0</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/psr/http-message/</location>
+    <name>PSR HTTP Message</name>
+    <version>2.0</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/symfony/filesystem/</location>
+    <name>Symfony Filesystem</name>
+    <version>v7.4.15</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/symfony/polyfill-ctype/</location>
+    <name>Symfony Polyfill Ctype</name>
+    <version>v1.37.0</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/symfony/polyfill-mbstring/</location>
+    <name>Symfony Polyfill Mbstring</name>
+    <version>v1.38.2</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/symfony/polyfill-php80/</location>
+    <name>Symfony Polyfill PHP 8.0</name>
+    <version>v1.37.0</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+  <library>
+    <location>vendor/symfony/polyfill-php82/</location>
+    <name>Symfony Polyfill PHP 8.2</name>
+    <version>v1.38.1</version>
+    <license>MIT</license>
+    <licenseversion></licenseversion>
+  </library>
+</libraries>

@@ -12,7 +12,7 @@ be enabled or released.
 
 ## Initial scope
 
-Version 0.1 covers Moodle-generated `.mbz` course backup archives. It does not
+Version 0.2 covers Moodle-generated `.mbz` course backup archives. It does not
 claim to back up an entire Moodle site, the Moodle database, all of
 `moodledata`, or locally installed code.
 

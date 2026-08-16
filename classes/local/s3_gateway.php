@@ -30,8 +30,12 @@ final class s3_gateway {
         global $CFG;
 
         if (!class_exists(S3Client::class)) {
-            $autoload = $CFG->tool_secure_s3_storage_awssdkautoload ?? '';
-            if (!is_string($autoload) || $autoload === '' || !is_readable($autoload)) {
+            $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+            $runtimeautoload = $CFG->tool_secure_s3_storage_awssdkautoload ?? '';
+            if (is_string($runtimeautoload) && $runtimeautoload !== '') {
+                $autoload = $runtimeautoload;
+            }
+            if (!is_readable($autoload)) {
                 throw new \runtime_exception('AWS SDK runtime is unavailable.');
             }
             require_once($autoload);

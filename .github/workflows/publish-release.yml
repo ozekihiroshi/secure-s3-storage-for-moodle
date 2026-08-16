@@ -1,0 +1,55 @@
+name: Publish release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish plugin ZIP
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out plugin source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify release metadata
+        shell: bash
+        run: php scripts/verify-release.php "${GITHUB_REF_NAME#v}"
+
+      - name: Build self-contained release ZIP
+        run: sh scripts/build-release.sh
+
+      - name: Create checksums
+        working-directory: build
+        run: sha256sum tool_secure_s3_storage.zip > tool_secure_s3_storage.zip.sha256
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          notes="docs/releases/${version}.md"
+          test -f "$notes"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" \
+              build/tool_secure_s3_storage.zip \
+              build/tool_secure_s3_storage.zip.sha256 \
+              --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              build/tool_secure_s3_storage.zip \
+              build/tool_secure_s3_storage.zip.sha256 \
+              --verify-tag \
+              --prerelease \
+              --title "Secure S3 Storage ${version}" \
+              --notes-file "$notes"
+          fi

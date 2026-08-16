@@ -12,11 +12,11 @@ requires the database, `moodledata`, configuration, and locally added code.
 
 ## Status
 
-This repository is in early development. The administrator settings page and
-scheduled transfer task are implemented, but transfers remain disabled by
-default. The task discovers stable top-level `.mbz` files, streams them to S3,
-reads them back to verify their SHA-256 digest and size, records transfer
-history, suppresses duplicates, and preserves the local archive.
+Version 0.2.0 is an alpha release for controlled evaluation on Moodle 5.2.
+Transfers remain disabled by default. The scheduled task discovers stable
+top-level `.mbz` files, streams them to S3, reads them back to verify their
+SHA-256 digest and size, records transfer history, suppresses duplicates, and
+preserves the local archive.
 
 AWS credentials are never entered in Moodle. The bundled AWS SDK uses its
 default credential provider chain. A runtime-only endpoint override supports
@@ -37,3 +37,49 @@ the course marker without repository or plugin source bind mounts.
 
 The security boundary and release acceptance criteria are defined in
 [`docs/security-model.md`](docs/security-model.md).
+
+## Requirements
+
+- Moodle 5.2
+- PHP 8.2 or later, as required by Moodle 5.2
+- PHP cURL support
+- An Amazon S3 bucket and a runtime AWS identity with access to the dedicated
+  destination prefix
+- A server directory containing completed Moodle course backup `.mbz` files
+
+AWS charges may apply. This plugin does not create buckets, IAM identities, or
+Moodle automated backup schedules.
+
+## Installation
+
+Download `tool_secure_s3_storage.zip` from the matching GitHub Release. Install
+it through **Site administration > Plugins > Install plugins**, or extract the
+`secure_s3_storage` directory to `admin/tool/` and complete the Moodle upgrade.
+
+Official release ZIP files include the pinned AWS SDK runtime. GitHub source
+archives do not contain `vendor/` and are not installable release packages.
+
+## Configuration
+
+1. Configure Moodle automated course backups to write `.mbz` files into a
+   dedicated directory readable by the web and cron processes.
+2. Supply AWS credentials through the runtime environment, IAM instance or task
+   role, web identity, or another AWS SDK credential provider.
+3. Open **Site administration > Plugins > Admin tools > Secure S3 Storage**.
+4. Configure the AWS region, bucket, dedicated prefix, source directory, and
+   stability interval.
+5. Enable scheduled transfer only after validating the destination permissions.
+
+The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
+`s3:DeleteObject` for incomplete verification cleanup below the configured
+prefix. The plugin does not currently perform retention or delete successfully
+verified objects.
+
+## Releases
+
+Release ZIP files are generated from a clean Git commit using the committed
+Composer lock file. Each GitHub Release also contains a SHA-256 checksum file.
+See [`CHANGES.md`](CHANGES.md) for release history.
+
+Marketplace submission text is maintained in
+[`docs/marketplace.md`](docs/marketplace.md).
