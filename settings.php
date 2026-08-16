@@ -1,0 +1,87 @@
+<?php
+// This file is part of Secure S3 Storage for Moodle.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+/**
+ * Administrative settings.
+ *
+ * Long-lived AWS credentials are deliberately not configurable here.
+ *
+ * @package   tool_secure_s3_storage
+ * @copyright 2026 Hiroshi Ozeki
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+if ($hassiteconfig) {
+    $settings = new admin_settingpage(
+        'tool_secure_s3_storage',
+        get_string('pluginname', 'tool_secure_s3_storage')
+    );
+
+    $settings->add(new admin_setting_heading(
+        'tool_secure_s3_storage/awsheading',
+        get_string('awsconfiguration', 'tool_secure_s3_storage'),
+        get_string('awsconfiguration_desc', 'tool_secure_s3_storage')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/region',
+        get_string('region', 'tool_secure_s3_storage'),
+        get_string('region_desc', 'tool_secure_s3_storage'),
+        'ap-northeast-1',
+        PARAM_ALPHANUMEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/bucket',
+        get_string('bucket', 'tool_secure_s3_storage'),
+        get_string('bucket_desc', 'tool_secure_s3_storage'),
+        '',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/prefix',
+        get_string('prefix', 'tool_secure_s3_storage'),
+        get_string('prefix_desc', 'tool_secure_s3_storage'),
+        'moodle/',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_heading(
+        'tool_secure_s3_storage/sourceheading',
+        get_string('backupsource', 'tool_secure_s3_storage'),
+        get_string('backupsource_desc', 'tool_secure_s3_storage')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/sourcedirectory',
+        get_string('sourcedirectory', 'tool_secure_s3_storage'),
+        get_string('sourcedirectory_desc', 'tool_secure_s3_storage'),
+        '/var/moodlebackups',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/stabilityseconds',
+        get_string('stabilityseconds', 'tool_secure_s3_storage'),
+        get_string('stabilityseconds_desc', 'tool_secure_s3_storage'),
+        60,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_secure_s3_storage/transferenabled',
+        get_string('transferenabled', 'tool_secure_s3_storage'),
+        get_string('transferenabled_desc', 'tool_secure_s3_storage'),
+        0
+    ));
+
+    $ADMIN->add('tools', $settings);
+}
