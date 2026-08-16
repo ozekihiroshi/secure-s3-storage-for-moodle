@@ -1,0 +1,41 @@
+name: ZIP release gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zip-release-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-gate:
+    name: Moodle ZIP install and MinIO restore
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out plugin source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: plugin-source
+          persist-credentials: false
+
+      - name: Check out release-gate environment
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ozekihiroshi/moodle-rescue
+          ref: main
+          path: moodle-rescue
+          persist-credentials: false
+
+      - name: Run isolated ZIP release gate
+        working-directory: moodle-rescue
+        env:
+          PLUGIN_REPOSITORY: ${{ github.workspace }}/plugin-source
+        run: scripts/run-release-gate-ci.sh

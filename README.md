@@ -1,5 +1,7 @@
 # Secure S3 Storage for Moodle
 
+[![ZIP release gate](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/release-gate.yml/badge.svg)](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/release-gate.yml)
+
 Secure S3 Storage is a Moodle administrator tool for transferring completed
 Moodle course backup archives to Amazon S3 without storing long-lived AWS
 access keys in Moodle.
@@ -20,6 +22,11 @@ AWS credentials are never entered in Moodle. The bundled AWS SDK uses its
 default credential provider chain. A runtime-only endpoint override supports
 S3-compatible development services such as MinIO without weakening the Moodle
 settings boundary.
+
+Every push to `main` and every pull request runs an isolated ZIP release gate.
+The workflow creates a real Moodle backup, transfers it to MinIO, installs the
+plugin ZIP into an empty Moodle environment, restores the backup, and verifies
+the course marker without repository or plugin source bind mounts.
 
 ## Component
 
