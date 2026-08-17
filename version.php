@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Version metadata for Secure S3 Storage.
@@ -17,7 +20,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_secure_s3_storage';
-$plugin->version = 2026081701;
+$plugin->version = 2026081702;
 $plugin->requires = 2026042000;
 $plugin->supported = [502, 502];
 $plugin->maturity = MATURITY_ALPHA;

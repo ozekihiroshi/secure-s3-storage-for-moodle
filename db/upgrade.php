@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Upgrade steps for Secure S3 Storage.
@@ -13,8 +16,6 @@
  * @copyright 2026 Hiroshi Ozeki
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Performs plugin database upgrades.
@@ -53,6 +54,17 @@ function xmldb_tool_secure_s3_storage_upgrade(int $oldversion): bool {
         }
 
         upgrade_plugin_savepoint(true, 2026081601, 'tool', 'secure_s3_storage');
+    }
+
+    if ($oldversion < 2026081702) {
+        $oldtable = new xmldb_table('tool_secure_s3_transfer');
+        $newtable = new xmldb_table('tool_secure_s3_storage_xfer');
+
+        if ($dbman->table_exists($oldtable) && !$dbman->table_exists($newtable)) {
+            $dbman->rename_table($oldtable, 'tool_secure_s3_storage_xfer');
+        }
+
+        upgrade_plugin_savepoint(true, 2026081702, 'tool', 'secure_s3_storage');
     }
 
     return true;

@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Verifies that a release tag matches version.php metadata.
@@ -17,6 +20,8 @@
 if (PHP_SAPI !== 'cli') {
     exit(1);
 }
+
+define('MOODLE_INTERNAL', true);
 
 $expected = $argv[1] ?? '';
 if (!preg_match('/^\d+\.\d+\.\d+$/D', $expected)) {

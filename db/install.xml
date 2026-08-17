@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="admin/tool/secure_s3_storage/db" VERSION="20260816" COMMENT="XMLDB file for Secure S3 Storage">
+<XMLDB PATH="admin/tool/secure_s3_storage/db" VERSION="20260817" COMMENT="XMLDB file for Secure S3 Storage">
   <TABLES>
-    <TABLE NAME="tool_secure_s3_transfer" COMMENT="Observed archives and verified S3 transfers">
+    <TABLE NAME="tool_secure_s3_storage_xfer" COMMENT="Observed archives and verified S3 transfers">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sourcehash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>

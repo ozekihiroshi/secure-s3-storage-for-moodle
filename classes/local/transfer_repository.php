@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace tool_secure_s3_storage\local;
 
@@ -16,12 +19,12 @@ namespace tool_secure_s3_storage\local;
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class transfer_repository {
-    private const TABLE = 'tool_secure_s3_transfer';
+    private const TABLE = 'tool_secure_s3_storage_xfer';
 
     /**
      * Observes an archive and reports whether it has remained stable long enough.
      *
-     * @param array{path: string, sourcehash: string, filename: string, size: int, mtime: int} $archive archive data
+     * @param array $archive archive data containing path, source hash, filename, size, and modification time
      * @param int $stabilityseconds required stable period
      * @return int|false|null record id when ready, null while waiting, or false when complete
      */

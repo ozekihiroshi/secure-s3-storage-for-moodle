@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace tool_secure_s3_storage\privacy;
 
@@ -26,7 +29,7 @@ final class provider implements \core_privacy\local\metadata\provider {
         \core_privacy\local\metadata\collection $collection
     ): \core_privacy\local\metadata\collection {
         $collection->add_database_table(
-            'tool_secure_s3_transfer',
+            'tool_secure_s3_storage_xfer',
             [
                 'filename' => 'privacy:metadata:transfer:filename',
                 'filesize' => 'privacy:metadata:transfer:filesize',

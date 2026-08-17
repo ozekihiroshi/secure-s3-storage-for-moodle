@@ -8,6 +8,8 @@
 - Expand Marketplace, privacy, external-service, and reviewer documentation.
 - Include third-party runtime reconstruction instructions inside the generated
   `vendor` directory.
+- Rename the transfer table through an upgrade step to follow the full plugin
+  component prefix.
 - Keep the release at alpha maturity while Marketplace review is pending.
 
 ## 0.2.1 - 2026-08-17

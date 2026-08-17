@@ -5,6 +5,9 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace tool_secure_s3_storage\local;
 
@@ -80,7 +83,7 @@ final class transfer_manager {
     /**
      * Opens one verified file descriptor and streams it through SHA-256.
      *
-     * @param array{path: string, sourcehash: string, filename: string, size: int, mtime: int} $archive archive data
+     * @param array $archive archive data containing path, source hash, filename, size, and modification time
      * @return array{0: resource, 1: string} open stream and lowercase SHA-256
      */
     private function open_stable_archive(array $archive): array {
