@@ -96,10 +96,11 @@ jobs:
 
       - name: Isolate Composer-generated files from author checks
         run: |
-          pluginvendor="moodle/public/admin/tool/secure_s3_storage/vendor"
+          pluginroot="moodle/public/admin/tool/secure_s3_storage"
+          pluginvendor="$pluginroot/vendor"
           generated="$RUNNER_TEMP/secure-s3-storage-composer-generated"
           mkdir "$generated"
-          mv "$pluginvendor/autoload.php" "$pluginvendor/bin" "$pluginvendor/composer" "$generated/"
+          mv "$pluginvendor/autoload.php" "$pluginvendor/bin" "$pluginvendor/composer" "$pluginroot/scripts" "$generated/"
 
       - name: PHP lint
         if: ${{ !cancelled() }}
@@ -116,10 +117,12 @@ jobs:
       - name: Restore Composer-generated files
         if: ${{ always() }}
         run: |
-          pluginvendor="moodle/public/admin/tool/secure_s3_storage/vendor"
+          pluginroot="moodle/public/admin/tool/secure_s3_storage"
+          pluginvendor="$pluginroot/vendor"
           generated="$RUNNER_TEMP/secure-s3-storage-composer-generated"
           if [ -d "$generated" ]; then
             mv "$generated/autoload.php" "$generated/bin" "$generated/composer" "$pluginvendor/"
+            mv "$generated/scripts" "$pluginroot/"
           fi
 
       - name: Plugin validation

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,8 +21,6 @@
  * @copyright 2026 Hiroshi Ozeki
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-define('MOODLE_INTERNAL', true);
 
 if (PHP_SAPI !== 'cli') {
     exit(1);
