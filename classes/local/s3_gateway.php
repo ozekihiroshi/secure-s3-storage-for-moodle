@@ -1,10 +1,16 @@
 <?php
-// This file is part of Secure S3 Storage for Moodle.
+
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
@@ -24,13 +30,18 @@ final class s3_gateway {
     /** @var S3Client AWS SDK client */
     private S3Client $client;
 
+    /** @var configuration validated transfer configuration */
+    private readonly configuration $configuration;
+
     /**
      * Creates a client without passing credentials, preserving the SDK default chain.
      *
      * @param configuration $configuration validated configuration
      */
-    public function __construct(private readonly configuration $configuration) {
+    public function __construct(configuration $configuration) {
         global $CFG;
+
+        $this->configuration = $configuration;
 
         if (!class_exists(S3Client::class)) {
             $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
@@ -122,8 +133,9 @@ final class s3_gateway {
                     'Bucket' => $this->configuration->bucket,
                     'Key' => $objectkey,
                 ]);
-            } catch (\Throwable) {
+            } catch (\Throwable $cleanupexception) {
                 // The local archive remains authoritative; cleanup can be retried safely.
+                unset($cleanupexception);
             }
             throw $exception;
         }

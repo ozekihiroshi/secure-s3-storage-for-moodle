@@ -1,10 +1,16 @@
 <?php
-// This file is part of Secure S3 Storage for Moodle.
+
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
@@ -19,7 +25,24 @@ namespace tool_secure_s3_storage\local;
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class configuration {
+    /** @var string normalized AWS region */
+    public readonly string $region;
+
+    /** @var string normalized S3 bucket */
+    public readonly string $bucket;
+
+    /** @var string normalized dedicated prefix with trailing slash */
+    public readonly string $prefix;
+
+    /** @var string canonical source directory */
+    public readonly string $sourcedirectory;
+
+    /** @var int required stable observation period */
+    public readonly int $stabilityseconds;
+
     /**
+     * Creates validated transfer configuration.
+     *
      * @param string $region normalized AWS region
      * @param string $bucket normalized S3 bucket
      * @param string $prefix normalized dedicated prefix with trailing slash
@@ -27,12 +50,17 @@ final class configuration {
      * @param int $stabilityseconds required stable observation period
      */
     private function __construct(
-        public readonly string $region,
-        public readonly string $bucket,
-        public readonly string $prefix,
-        public readonly string $sourcedirectory,
-        public readonly int $stabilityseconds,
+        string $region,
+        string $bucket,
+        string $prefix,
+        string $sourcedirectory,
+        int $stabilityseconds,
     ) {
+        $this->region = $region;
+        $this->bucket = $bucket;
+        $this->prefix = $prefix;
+        $this->sourcedirectory = $sourcedirectory;
+        $this->stabilityseconds = $stabilityseconds;
     }
 
     /**

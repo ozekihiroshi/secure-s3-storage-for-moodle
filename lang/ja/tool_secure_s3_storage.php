@@ -1,10 +1,16 @@
 <?php
-// This file is part of Secure S3 Storage for Moodle.
+
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
@@ -27,8 +33,18 @@ $string['pluginname'] = 'Secure S3 Storage';
 $string['prefix'] = 'S3プレフィックス';
 $string['prefix_desc'] = 'このプラグイン専用のオブジェクトプレフィックスです。Retentionはこの範囲外を操作しません。';
 $string['privacy:metadata'] = 'Secure S3 Storageは、アーカイブのファイル名、サイズ、チェックサム、オブジェクトキー、転送状態、時刻を記録します。コースバックアップには個人データが含まれる場合があり、設定したS3転送先へ送信されます。';
+$string['privacy:metadata:s3'] = '設定されたS3互換ストレージへMoodleコースバックアップアーカイブを送信します。';
+$string['privacy:metadata:s3:archive'] = 'Moodleバックアップ設定で選択されたコース参加者データを含む可能性があるコースバックアップアーカイブです。';
+$string['privacy:metadata:transfer'] = '観測および転送したMoodleバックアップアーカイブの監査記録です。';
+$string['privacy:metadata:transfer:checksum'] = 'アーカイブのSHA-256チェックサムです。';
+$string['privacy:metadata:transfer:filename'] = 'ローカルアーカイブのファイル名です。';
+$string['privacy:metadata:transfer:filesize'] = 'アーカイブのサイズです。';
+$string['privacy:metadata:transfer:objectkey'] = '転送先S3オブジェクトキーです。';
+$string['privacy:metadata:transfer:status'] = '転送状態です。';
+$string['privacy:metadata:transfer:timecreated'] = 'アーカイブが最初に記録された時刻です。';
 $string['region'] = 'AWSリージョン';
 $string['region_desc'] = '転送先バケットが存在するAWSリージョンです。';
+$string['secure_s3_storage:manage'] = 'Secure S3 Storageの設定とバックアップ転送を管理する';
 $string['sourcedirectory'] = 'バックアップディレクトリ';
 $string['sourcedirectory_desc'] = 'Moodle自動コースバックアップが使用するサーバー上の絶対パスです。ファイルを調べる前にパスを検証します。';
 $string['stabilityseconds'] = '安定性の観測時間';
@@ -42,13 +58,3 @@ $string['task_no_files'] = '対象となるMoodleバックアップアーカイ�
 $string['task_transfer_course_backups'] = '生成済みコースバックアップをAmazon S3へ転送する';
 $string['transferenabled'] = '定期転送を有効にする';
 $string['transferenabled_desc'] = '初期状態では無効です。バックアップ元とS3転送先を検証した後にだけ有効にします。';
-$string['secure_s3_storage:manage'] = 'Secure S3 Storageの設定とバックアップ転送を管理する';
-$string['privacy:metadata:s3'] = '設定されたS3互換ストレージへMoodleコースバックアップアーカイブを送信します。';
-$string['privacy:metadata:s3:archive'] = 'Moodleバックアップ設定で選択されたコース参加者データを含む可能性があるコースバックアップアーカイブです。';
-$string['privacy:metadata:transfer'] = '観測および転送したMoodleバックアップアーカイブの監査記録です。';
-$string['privacy:metadata:transfer:checksum'] = 'アーカイブのSHA-256チェックサムです。';
-$string['privacy:metadata:transfer:filename'] = 'ローカルアーカイブのファイル名です。';
-$string['privacy:metadata:transfer:filesize'] = 'アーカイブのサイズです。';
-$string['privacy:metadata:transfer:objectkey'] = '転送先S3オブジェクトキーです。';
-$string['privacy:metadata:transfer:status'] = '転送状態です。';
-$string['privacy:metadata:transfer:timecreated'] = 'アーカイブが最初に記録された時刻です。';

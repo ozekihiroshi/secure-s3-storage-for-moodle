@@ -95,7 +95,7 @@ jobs:
           MOODLE_BRANCH: MOODLE_502_STABLE
 
       - name: Isolate third-party runtime from author checks
-        run: mv plugin/vendor "$RUNNER_TEMP/secure-s3-storage-vendor"
+        run: mv moodle/public/admin/tool/secure_s3_storage/vendor "$RUNNER_TEMP/secure-s3-storage-vendor"
 
       - name: PHP lint
         if: ${{ !cancelled() }}
@@ -113,7 +113,7 @@ jobs:
         if: ${{ always() }}
         run: |
           if [ -d "$RUNNER_TEMP/secure-s3-storage-vendor" ]; then
-            mv "$RUNNER_TEMP/secure-s3-storage-vendor" plugin/vendor
+            mv "$RUNNER_TEMP/secure-s3-storage-vendor" moodle/public/admin/tool/secure_s3_storage/vendor
           fi
 
       - name: Plugin validation
