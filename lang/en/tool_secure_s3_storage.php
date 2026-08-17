@@ -33,6 +33,7 @@ $string['stabilityseconds_desc'] = 'A file must retain the same size and modific
 $string['task_already_running'] = 'Another Secure S3 Storage scan is already running.';
 $string['task_configuration_error'] = 'Secure S3 Storage configuration is invalid; transfer stopped.';
 $string['task_file_failed'] = 'Transfer failed for {$a}. The local archive was preserved.';
+$string['task_failure_detail'] = 'Failure detail ({$a->type}): {$a->message}';
 $string['task_file_observed'] = 'Observed {$a}; waiting for the stability period.';
 $string['task_file_transferred'] = 'Transferred and verified {$a}.';
 $string['task_no_files'] = 'No eligible Moodle backup archives were found.';

@@ -62,9 +62,11 @@ final class transfer_manager {
                 $result['transferred']++;
                 mtrace(get_string('task_file_transferred', 'tool_secure_s3_storage', $archive['filename']));
             } catch (\Throwable $exception) {
-                $this->repository->mark_failure($recordid, (new \ReflectionClass($exception))->getShortName());
+                $errorcategory = (new \ReflectionClass($exception))->getShortName();
+                $this->repository->mark_failure($recordid, $errorcategory);
                 $result['failed']++;
                 mtrace(get_string('task_file_failed', 'tool_secure_s3_storage', $archive['filename']));
+                $this->trace_failure_detail($errorcategory, $exception->getMessage());
             } finally {
                 if (is_resource($handle)) {
                     fclose($handle);
@@ -84,13 +86,13 @@ final class transfer_manager {
     private function open_stable_archive(array $archive): array {
         clearstatcache(true, $archive['path']);
         if (is_link($archive['path']) || realpath($archive['path']) !== $archive['path']) {
-            throw new \runtime_exception('Archive boundary verification failed.');
+            throw new \RuntimeException('Archive boundary verification failed.');
         }
 
         $before = lstat($archive['path']);
         $handle = fopen($archive['path'], 'rb');
         if ($before === false || $handle === false) {
-            throw new \runtime_exception('Unable to open archive.');
+            throw new \RuntimeException('Unable to open archive.');
         }
 
         try {
@@ -102,14 +104,14 @@ final class transfer_manager {
                 (int)$opened['size'] !== $archive['size'] ||
                 (int)$opened['mtime'] !== $archive['mtime']
             ) {
-                throw new \runtime_exception('Archive changed before checksum.');
+                throw new \RuntimeException('Archive changed before checksum.');
             }
 
             $hash = hash_init('sha256');
             while (!feof($handle)) {
                 $chunk = fread($handle, 1024 * 1024);
                 if ($chunk === false) {
-                    throw new \runtime_exception('Unable to read archive.');
+                    throw new \RuntimeException('Unable to read archive.');
                 }
                 if ($chunk !== '') {
                     hash_update($hash, $chunk);
@@ -122,10 +124,10 @@ final class transfer_manager {
                 (int)$after['size'] !== $archive['size'] ||
                 (int)$after['mtime'] !== $archive['mtime']
             ) {
-                throw new \runtime_exception('Archive changed during checksum.');
+                throw new \RuntimeException('Archive changed during checksum.');
             }
             if (!rewind($handle)) {
-                throw new \runtime_exception('Unable to rewind archive.');
+                throw new \RuntimeException('Unable to rewind archive.');
             }
 
             return [$handle, hash_final($hash)];
@@ -133,5 +135,23 @@ final class transfer_manager {
             fclose($handle);
             throw $exception;
         }
+    }
+
+    /**
+     * Writes bounded diagnostic detail without persisting provider messages.
+     *
+     * @param string $errorcategory exception class short name
+     * @param string $message provider or runtime exception message
+     */
+    private function trace_failure_detail(string $errorcategory, string $message): void {
+        $message = preg_replace('/\s+/', ' ', trim($message));
+        if (!is_string($message) || $message === '') {
+            $message = 'No additional detail was provided.';
+        }
+
+        mtrace(get_string('task_failure_detail', 'tool_secure_s3_storage', (object)[
+            'type' => $errorcategory,
+            'message' => \core_text::substr($message, 0, 2000),
+        ]));
     }
 }

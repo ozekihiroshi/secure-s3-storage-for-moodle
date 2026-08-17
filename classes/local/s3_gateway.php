@@ -36,7 +36,7 @@ final class s3_gateway {
                 $autoload = $runtimeautoload;
             }
             if (!is_readable($autoload)) {
-                throw new \runtime_exception('AWS SDK runtime is unavailable.');
+                throw new \RuntimeException('AWS SDK runtime is unavailable.');
             }
             require_once($autoload);
         }
@@ -70,7 +70,7 @@ final class s3_gateway {
      */
     public function upload_and_verify($handle, int $size, string $checksum, string $objectkey): void {
         if (!is_resource($handle)) {
-            throw new \runtime_exception('Invalid archive stream.');
+            throw new \RuntimeException('Invalid archive stream.');
         }
 
         $this->client->putObject([
@@ -92,12 +92,12 @@ final class s3_gateway {
             ]);
 
             if ((int)$result['ContentLength'] !== $size) {
-                throw new \runtime_exception('Remote object size verification failed.');
+                throw new \RuntimeException('Remote object size verification failed.');
             }
 
             $metadata = array_change_key_case((array)($result['Metadata'] ?? []), CASE_LOWER);
             if (!isset($metadata['sha256']) || !hash_equals($checksum, (string)$metadata['sha256'])) {
-                throw new \runtime_exception('Remote object metadata verification failed.');
+                throw new \RuntimeException('Remote object metadata verification failed.');
             }
 
             $remotehash = hash_init('sha256');
@@ -105,13 +105,13 @@ final class s3_gateway {
             while (!$body->eof()) {
                 $chunk = $body->read(1024 * 1024);
                 if ($chunk === '' && !$body->eof()) {
-                    throw new \runtime_exception('Remote object read failed.');
+                    throw new \RuntimeException('Remote object read failed.');
                 }
                 hash_update($remotehash, $chunk);
             }
 
             if (!hash_equals($checksum, hash_final($remotehash))) {
-                throw new \runtime_exception('Remote object checksum verification failed.');
+                throw new \RuntimeException('Remote object checksum verification failed.');
             }
         } catch (\Throwable $exception) {
             try {
@@ -135,13 +135,13 @@ final class s3_gateway {
     private function validate_runtime_endpoint(string $endpoint): string {
         $parts = parse_url($endpoint);
         if ($parts === false || !isset($parts['scheme'], $parts['host'])) {
-            throw new \runtime_exception('Invalid runtime S3 endpoint.');
+            throw new \RuntimeException('Invalid runtime S3 endpoint.');
         }
         if (!in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
-            throw new \runtime_exception('Invalid runtime S3 endpoint.');
+            throw new \RuntimeException('Invalid runtime S3 endpoint.');
         }
         if (isset($parts['user']) || isset($parts['pass']) || isset($parts['query']) || isset($parts['fragment'])) {
-            throw new \runtime_exception('Invalid runtime S3 endpoint.');
+            throw new \RuntimeException('Invalid runtime S3 endpoint.');
         }
 
         return rtrim($endpoint, '/');

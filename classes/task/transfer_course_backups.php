@@ -48,7 +48,7 @@ final class transfer_course_backups extends \core\task\scheduled_task {
             } catch (\Throwable) {
                 $message = get_string('task_configuration_error', 'tool_secure_s3_storage');
                 mtrace($message);
-                throw new \runtime_exception($message);
+                throw new \RuntimeException($message);
             }
 
             $manager = new \tool_secure_s3_storage\local\transfer_manager();
@@ -61,7 +61,7 @@ final class transfer_course_backups extends \core\task\scheduled_task {
                 mtrace($result['observed'] . ' archive(s) are waiting for the stability period.');
             }
             if ($result['failed'] > 0) {
-                throw new \runtime_exception('One or more S3 transfers failed; local archives were preserved.');
+                throw new \RuntimeException('One or more S3 transfers failed; local archives were preserved.');
             }
         } finally {
             $lock->release();
