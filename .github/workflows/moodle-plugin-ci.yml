@@ -78,11 +78,24 @@ jobs:
           sudo locale-gen en_AU.UTF-8
           echo "NVM_DIR=$HOME/.nvm" >> "$GITHUB_ENV"
 
+      - name: Install pinned plugin runtime
+        working-directory: plugin
+        run: >-
+          composer install
+          --no-dev
+          --classmap-authoritative
+          --no-interaction
+          --no-progress
+          --no-scripts
+
       - name: Install Moodle and plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: MOODLE_502_STABLE
+
+      - name: Isolate third-party runtime from author checks
+        run: mv plugin/vendor "$RUNNER_TEMP/secure-s3-storage-vendor"
 
       - name: PHP lint
         if: ${{ !cancelled() }}
@@ -96,6 +109,13 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpdoc --max-warnings 0
 
+      - name: Restore third-party runtime
+        if: ${{ always() }}
+        run: |
+          if [ -d "$RUNNER_TEMP/secure-s3-storage-vendor" ]; then
+            mv "$RUNNER_TEMP/secure-s3-storage-vendor" plugin/vendor
+          fi
+
       - name: Plugin validation
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci validate
@@ -103,16 +123,6 @@ jobs:
       - name: Upgrade savepoint check
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci savepoints
-
-      - name: Install pinned plugin runtime
-        working-directory: plugin
-        run: >-
-          composer install
-          --no-dev
-          --classmap-authoritative
-          --no-interaction
-          --no-progress
-          --no-scripts
 
       - name: PHPUnit
         if: ${{ !cancelled() }}
