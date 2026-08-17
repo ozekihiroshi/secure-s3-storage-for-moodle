@@ -12,6 +12,11 @@ top-level `.mbz` course backup files in a configured server directory, streams
 them to a dedicated Amazon S3 bucket prefix, and verifies each remote object by
 size, metadata, and SHA-256 read-back before marking the transfer complete.
 
+The plugin does not create or schedule course backups. The site administrator
+must configure Moodle automated course backups to write to the source
+directory, ensure that the Moodle web and Cron processes share that storage,
+and run Moodle Cron regularly.
+
 The plugin uses the AWS SDK default credential provider chain. Deployments can
 therefore use IAM roles, container credentials, web identity, or another
 runtime-provided AWS credential source without saving access keys in Moodle.
