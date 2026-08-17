@@ -1,6 +1,7 @@
 # Secure S3 Storage for Moodle
 
 [![ZIP release gate](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/release-gate.yml/badge.svg)](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/release-gate.yml)
+[![Moodle Plugin CI](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/moodle-plugin-ci.yml)
 
 Secure S3 Storage is a Moodle administrator tool for transferring completed
 Moodle course backup archives to Amazon S3 without storing long-lived AWS
@@ -12,7 +13,7 @@ requires the database, `moodledata`, configuration, and locally added code.
 
 ## Status
 
-Version 0.2.1 is an alpha release for controlled evaluation on Moodle 5.2.
+Version 0.2.2 is an alpha release candidate for controlled evaluation on Moodle 5.2.
 Transfers remain disabled by default. The scheduled task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
@@ -74,6 +75,19 @@ The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
 `s3:DeleteObject` for incomplete verification cleanup below the configured
 prefix. The plugin does not currently perform retention or delete successfully
 verified objects.
+
+## Privacy and external service
+
+Course backup archives can contain participant names, identifiers, activity
+content, submissions, grades, and other personal data selected by Moodle's
+backup settings. When transfer is enabled, each eligible archive is sent to the
+administrator-configured Amazon S3 or compatible destination. The site operator
+is responsible for the destination's region, access controls, encryption,
+retention, legal basis, and data-processing notices.
+
+Moodle stores operational transfer audit metadata, including the local
+filename, size, checksum, object key, status, and timestamps. The plugin does
+not send static AWS credentials or store them in Moodle settings.
 
 ## Releases
 

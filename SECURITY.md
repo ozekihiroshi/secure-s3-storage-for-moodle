@@ -2,8 +2,8 @@
 
 ## Supported version
 
-Security fixes are provided for the latest published release. Version 0.2.0 is
-an alpha release intended for controlled evaluation on Moodle 5.2.
+Security fixes are provided for the latest published release. Version 0.2.1 is
+the latest published alpha release for controlled evaluation on Moodle 5.2.
 
 ## Reporting a vulnerability
 

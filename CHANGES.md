@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2 - 2026-08-17
+
+- Add Moodle Plugin CI checks for Moodle 5.2 on MariaDB and PostgreSQL across
+  the supported PHP range endpoints.
+- Align the Composer dependency platform with the minimum supported PHP 8.2.
+- Expand Marketplace, privacy, external-service, and reviewer documentation.
+- Include third-party runtime reconstruction instructions inside the generated
+  `vendor` directory.
+- Keep the release at alpha maturity while Marketplace review is pending.
+
 ## 0.2.1 - 2026-08-17
 
 - Fix transfer failure reporting so the original exception is preserved and

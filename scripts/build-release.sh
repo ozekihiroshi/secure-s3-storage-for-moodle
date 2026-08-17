@@ -57,6 +57,8 @@ docker run --rm \
 test -f "$stagedplugin/vendor/autoload.php"
 test -f "$stagedplugin/vendor/aws/aws-sdk-php/LICENSE"
 
+cp "$stagedplugin/readme_moodle.txt" "$stagedplugin/vendor/readme_moodle.txt"
+test -f "$stagedplugin/vendor/readme_moodle.txt"
 (
     cd "$buildroot"
     zip -qr "$temporaryzip" secure_s3_storage
@@ -68,9 +70,12 @@ unzip -Z1 "$temporaryzip" | awk '
     $0 == "secure_s3_storage/settings.php" { settings = 1 }
     $0 == "secure_s3_storage/thirdpartylibs.xml" { thirdpartylibs = 1 }
     $0 == "secure_s3_storage/vendor/autoload.php" { autoload = 1 }
+    $0 == "secure_s3_storage/vendor/readme_moodle.txt" { readme = 1 }
     $0 ~ /^secure_s3_storage\/\.github\// { invalid = 1 }
     $0 ~ /^secure_s3_storage\/scripts\// { invalid = 1 }
-    END { exit invalid || !version || !settings || !thirdpartylibs || !autoload }
+    END {
+        exit invalid || !version || !settings || !thirdpartylibs || !autoload || !readme
+    }
 '
 
 mv "$temporaryzip" "$output"
