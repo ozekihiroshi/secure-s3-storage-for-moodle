@@ -22,6 +22,13 @@ The first release targets Moodle-generated `.mbz` course backups. It is not a
 complete Moodle site disaster-recovery product: a full site recovery also
 requires the database, `moodledata`, configuration, and locally added code.
 
+The planned order is database backup, local content backup, native S3 content
+storage without an external plugin dependency, and independent protection of
+that primary S3 content. See [`docs/roadmap.md`](docs/roadmap.md) for the
+reason and completion condition for each step. Detailed boundaries are in
+[`docs/backup-architecture.md`](docs/backup-architecture.md). Features after
+course archive transfer are not implemented in version 0.2.
+
 ## Status
 
 Version 0.2.2 is an alpha release candidate for controlled evaluation on Moodle 5.2.
