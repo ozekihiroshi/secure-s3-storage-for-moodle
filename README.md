@@ -12,7 +12,7 @@ requires the database, `moodledata`, configuration, and locally added code.
 
 ## Status
 
-Version 0.2.0 is an alpha release for controlled evaluation on Moodle 5.2.
+Version 0.2.1 is an alpha release for controlled evaluation on Moodle 5.2.
 Transfers remain disabled by default. The scheduled task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
