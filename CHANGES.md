@@ -10,6 +10,7 @@
   `vendor` directory.
 - Rename the transfer table through an upgrade step to follow the full plugin
   component prefix.
+- Conform plugin-owned PHP and language files to Moodle coding standards.
 - Keep the release at alpha maturity while Marketplace review is pending.
 
 ## 0.2.1 - 2026-08-17

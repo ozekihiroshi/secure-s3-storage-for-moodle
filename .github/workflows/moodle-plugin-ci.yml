@@ -94,8 +94,12 @@ jobs:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: MOODLE_502_STABLE
 
-      - name: Isolate third-party runtime from author checks
-        run: mv moodle/public/admin/tool/secure_s3_storage/vendor "$RUNNER_TEMP/secure-s3-storage-vendor"
+      - name: Isolate Composer-generated files from author checks
+        run: |
+          pluginvendor="moodle/public/admin/tool/secure_s3_storage/vendor"
+          generated="$RUNNER_TEMP/secure-s3-storage-composer-generated"
+          mkdir "$generated"
+          mv "$pluginvendor/autoload.php" "$pluginvendor/bin" "$pluginvendor/composer" "$generated/"
 
       - name: PHP lint
         if: ${{ !cancelled() }}
@@ -109,11 +113,13 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpdoc --max-warnings 0
 
-      - name: Restore third-party runtime
+      - name: Restore Composer-generated files
         if: ${{ always() }}
         run: |
-          if [ -d "$RUNNER_TEMP/secure-s3-storage-vendor" ]; then
-            mv "$RUNNER_TEMP/secure-s3-storage-vendor" moodle/public/admin/tool/secure_s3_storage/vendor
+          pluginvendor="moodle/public/admin/tool/secure_s3_storage/vendor"
+          generated="$RUNNER_TEMP/secure-s3-storage-composer-generated"
+          if [ -d "$generated" ]; then
+            mv "$generated/autoload.php" "$generated/bin" "$generated/composer" "$pluginvendor/"
           fi
 
       - name: Plugin validation
