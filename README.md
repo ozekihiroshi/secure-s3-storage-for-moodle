@@ -31,7 +31,7 @@ course archive transfer are not implemented in version 0.2.
 
 ## Status
 
-Version 0.2.2 is an alpha release candidate for controlled evaluation on Moodle 5.2.
+Version 0.2.3 is an alpha release candidate for controlled evaluation on Moodle 5.2.
 Transfers remain disabled by default. The scheduled task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and

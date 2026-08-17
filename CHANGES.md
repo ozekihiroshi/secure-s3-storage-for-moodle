@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.3 - 2026-08-18
+
+- Document the complete Moodle automated-backup, shared-directory, Cron, S3
+  transfer, local-retention, and recovery operating path.
+- Add a security-first development roadmap with a restore gate and explicit
+  completion condition for every planned phase.
+- Define the responsibility boundary shared by the plugin and the companion
+  Docker reference deployment.
+- Keep database backup, content backup, and native S3 primary storage clearly
+  marked as unimplemented future work with no external ObjectFS dependency.
+- Preserve the version 0.2 transfer behavior and alpha maturity for Marketplace
+  review.
+
 ## 0.2.2 - 2026-08-17
 
 - Add Moodle Plugin CI checks for Moodle 5.2 on MariaDB and PostgreSQL across
