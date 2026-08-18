@@ -160,7 +160,7 @@ site also requires independently protected copies of the database,
 separate Moodle environment rather than assuming that an upload alone proves
 recoverability.
 
-## Database artifact path in 0.3 development
+## Database artifact path in 0.3
 
 Database backup is separate from Moodle automated course backups. The plugin
 does not create a dump. A privileged deployment producer publishes a completed

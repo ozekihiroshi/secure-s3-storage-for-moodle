@@ -18,25 +18,24 @@ Moodle automated course backups
         -> Amazon S3
 ```
 
-The public 0.2 release targets Moodle-generated `.mbz` course backups. The
-0.3 development branch adds a manifest-validated MariaDB artifact path, while
-keeping dump creation and restore privileges outside Moodle PHP. It is not yet
-a complete site disaster-recovery product: full recovery also requires
-`moodledata`, configuration, and locally added code.
+Version 0.3 supports Moodle-generated `.mbz` course backups and a
+manifest-validated MariaDB artifact path, while keeping dump creation and
+restore privileges outside Moodle PHP. It is not yet a complete site
+disaster-recovery product: full recovery also requires `moodledata`,
+configuration, and locally added code.
 
 The planned order is database backup, local content backup, native S3 content
 storage without an external plugin dependency, and independent protection of
 that primary S3 content. See [`docs/roadmap.md`](docs/roadmap.md) for the
 reason and completion condition for each step. Detailed boundaries are in
-[`docs/backup-architecture.md`](docs/backup-architecture.md). Features after
-course archive transfer are not implemented in version 0.2.
+[`docs/backup-architecture.md`](docs/backup-architecture.md). Content backup and
+primary S3 content storage are not implemented in version 0.3.
 
 ## Status
 
-The latest public release is 0.2.3 Alpha for controlled course-backup evaluation
-on Moodle 5.2. The `main` branch is 0.3.0-dev and adds database artifact
-transfer. Course and database transfers remain independently disabled by
-default. The course task discovers stable
+The latest public release is 0.3.0 Alpha for controlled course and database
+artifact evaluation on Moodle 5.2. Course and database transfers remain
+independently disabled by default. The course task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
 preserves the local archive.
@@ -47,9 +46,11 @@ S3-compatible development services such as MinIO without weakening the Moodle
 settings boundary.
 
 Every push to `main` and every pull request runs an isolated ZIP release gate.
-The workflow creates a real Moodle backup, transfers it to MinIO, installs the
-plugin ZIP into an empty Moodle environment, restores the backup, and verifies
-the course marker without repository or plugin source bind mounts.
+The workflow installs the plugin ZIP into an empty Moodle environment, rejects
+an abnormal database manifest and a checksum-corrupt payload, and confirms no
+completion manifest is published. It then transfers and restores a real
+MariaDB dump through MinIO and a separate empty database. The existing course
+backup, checksum, and restore gate also runs without a plugin source bind mount.
 
 ## Component
 

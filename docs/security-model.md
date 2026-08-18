@@ -13,10 +13,10 @@ be enabled or released.
 
 ## Initial scope
 
-Version 0.2 covers Moodle-generated `.mbz` course backup archives. The 0.3
-development branch adds transfer of externally produced MariaDB artifacts under
-the exact v1 manifest contract. It does not yet protect all of `moodledata`,
-configuration, or locally installed code.
+Version 0.3 covers Moodle-generated `.mbz` course backup archives and transfer
+of externally produced MariaDB artifacts under the exact v1 manifest contract.
+It does not yet protect all of `moodledata`, configuration, or locally installed
+code.
 
 ## Protected assets
 

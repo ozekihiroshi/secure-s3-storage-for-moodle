@@ -7,10 +7,10 @@ Storage beyond its current course-backup transfer scope. It defines ownership,
 trust boundaries, and a future artifact hand-off contract shared with the
 companion `moodle-rescue` reference deployment.
 
-Version 0.2 implements only the legacy course archive path in
-[`operations.md`](operations.md). The 0.3 development branch implements the
-database artifact v1 validator and transfer path. Content artifacts and primary
-S3 content storage remain design targets.
+Version 0.3 implements the course archive path in
+[`operations.md`](operations.md) and the database artifact v1 validator and
+transfer path. Content artifacts and primary S3 content storage remain design
+targets.
 
 The current normative controls remain in
 [`security-model.md`](security-model.md). Before another artifact type is
@@ -152,9 +152,9 @@ restore environment's database role.
 
 ## Database backup boundary
 
-Database artifact transfer is implemented on the 0.3 development branch, but
-Moodle PHP must not
-implement a general SQL exporter or execute administrator-supplied shell text.
+Database artifact transfer is implemented in version 0.3, but Moodle PHP must
+not implement a general SQL exporter or execute administrator-supplied shell
+text.
 
 The initial producer is a dedicated deployment process using the database
 vendor's supported dump utility. For the MariaDB reference deployment it:

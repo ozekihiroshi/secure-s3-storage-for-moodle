@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0-dev - Unreleased
+## 0.3.0 - 2026-08-18
 
 - Add the strict database artifact v1 manifest and filename contract.
 - Add independently disabled database artifact settings and scheduled transfer.
@@ -10,6 +10,11 @@
   `database/v1/YYYY/MM/DD/<artifactid>/`.
 - Keep DB credentials, dump execution, and all restore capability outside Moodle
   PHP; use the companion deployment's isolated MinIO restore gate.
+- Reject abnormal manifests and checksum-corrupt payloads without publishing an
+  S3 completion manifest, while preserving the local artifact.
+- Pass the clean-ZIP, empty-Moodle release gate through real MariaDB dump
+  creation, MinIO transfer, download, isolated restore, and fresh-Moodle read.
+
 ## 0.2.3 - 2026-08-18
 
 - Document the complete Moodle automated-backup, shared-directory, Cron, S3

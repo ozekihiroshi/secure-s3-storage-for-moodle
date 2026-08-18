@@ -3,11 +3,11 @@
 ## Status
 
 This document defines the first stable hand-off contract between a privileged
-database backup producer and Secure S3 Storage. Public version 0.2 does not
-implement this contract. The 0.3 development branch implements it with database
-transfer disabled by default. The reference producer, validator, MinIO S3
-round-trip, and isolated MariaDB/Moodle restore gate pass together locally;
-clean-ZIP failure cases and AWS recovery remain release gates.
+database backup producer and Secure S3 Storage. Version 0.3 implements it with
+database transfer disabled by default. The reference producer, validator,
+clean-ZIP rejection tests, MinIO S3 round-trip, and isolated MariaDB/Moodle
+restore gate pass locally and in GitHub Actions. Real-AWS database recovery
+remains an operator validation requirement.
 
 The contract is independent of Docker. A container, systemd timer, Kubernetes
 Job, or managed export adapter may produce the same artifact.
