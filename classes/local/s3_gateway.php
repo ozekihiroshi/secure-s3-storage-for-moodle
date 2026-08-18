@@ -80,8 +80,17 @@ final class s3_gateway {
      * @param int $size expected archive size
      * @param string $checksum expected lowercase SHA-256
      * @param string $objectkey normalized plugin-owned object key
+     * @param string $contenttype bounded object content type
+     * @param string $format bounded object format metadata
      */
-    public function upload_and_verify($handle, int $size, string $checksum, string $objectkey): void {
+    public function upload_and_verify(
+        $handle,
+        int $size,
+        string $checksum,
+        string $objectkey,
+        string $contenttype = 'application/vnd.moodle.backup',
+        string $format = 'moodle-mbz',
+    ): void {
         if (!is_resource($handle)) {
             throw new \RuntimeException('Invalid archive stream.');
         }
@@ -91,10 +100,10 @@ final class s3_gateway {
             'Key' => $objectkey,
             'Body' => $handle,
             'ContentLength' => $size,
-            'ContentType' => 'application/vnd.moodle.backup',
+            'ContentType' => $contenttype,
             'Metadata' => [
                 'sha256' => $checksum,
-                'format' => 'moodle-mbz',
+                'format' => $format,
             ],
         ]);
 

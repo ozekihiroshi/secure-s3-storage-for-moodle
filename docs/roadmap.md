@@ -28,21 +28,25 @@ downloaded archive restored as a separate Moodle course.
 **Why first:** Moodle already creates the archive, so S3 transfer and recovery
 could be proved without changing Moodle's database or live file storage.
 
-## Next: database backup
+## Current development: database backup
 
 ```text
-MariaDB -> consistent dump -> compression/encryption -> Secure S3 Storage -> S3
+MariaDB -> consistent dump -> gzip + manifest -> Secure S3 Storage -> S3
 ```
 
-A dedicated producer will create the dump without giving database-administrator
-credentials to the Moodle web process. The plugin will validate, upload, verify,
-record, and retrieve the completed artifact.
+The reference producer now creates a compressed dump without giving
+database-administrator credentials to the Moodle web process. The 0.3
+development plugin validates the exact v1 manifest, uploads and reads back the
+payload and completion manifest, and records the result. A MinIO download into
+a separate volume has been restored into an isolated MariaDB and read by a fresh
+Moodle container.
 
 **Why next:** Course archives do not contain all site state. A database backup is
 the smallest next step toward full-site recovery.
 
-**Complete when:** A released plugin ZIP transfers a real dump and an isolated
-test restores it into an empty database that Moodle can read.
+**Remaining release gate:** A clean plugin ZIP must pass upgrade, invalid-manifest,
+remote-corruption, MinIO restore, and AWS IAM-separated recovery tests before
+database transfer is released.
 
 ## Then: content backup
 

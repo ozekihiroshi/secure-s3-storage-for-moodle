@@ -7,10 +7,10 @@ Storage beyond its current course-backup transfer scope. It defines ownership,
 trust boundaries, and a future artifact hand-off contract shared with the
 companion `moodle-rescue` reference deployment.
 
-The contract is a design target unless a feature is explicitly described as
-implemented. Version 0.2 implements only the legacy course archive path in
-[`operations.md`](operations.md); it does not ingest database or content
-artifacts.
+Version 0.2 implements only the legacy course archive path in
+[`operations.md`](operations.md). The 0.3 development branch implements the
+database artifact v1 validator and transfer path. Content artifacts and primary
+S3 content storage remain design targets.
 
 The current normative controls remain in
 [`security-model.md`](security-model.md). Before another artifact type is
@@ -108,7 +108,7 @@ Version 0.2 scans stable top-level `.mbz` files in the configured source
 directory. This remains the compatibility adapter for Moodle automated course
 backups until a manifest-based producer is implemented.
 
-### Future manifest path
+### Database manifest path
 
 Database and content producers use a versioned, manifest-based hand-off:
 
@@ -123,29 +123,11 @@ inside the configured hand-off directory. It rejects symlinks, traversal,
 unsupported schema versions or types, unsafe names, and mismatched sizes or
 digests.
 
-An illustrative manifest is:
-
-```json
-{
-  "schema": "tool_secure_s3_storage.artifact/v1",
-  "artifactid": "018f4c72-4f0e-7f16-9d5c-b8c4f616be2f",
-  "type": "database",
-  "createdat": "2026-08-17T03:00:00Z",
-  "payload": "moodle-db-20260817T030000Z.sql.gz.age",
-  "bytes": 123456789,
-  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-  "format": "mariadb-sql",
-  "compression": "gzip",
-  "encryption": "age",
-  "recoverysetid": "20260817T030000Z-daily"
-}
-```
-
-This is not yet a stable public schema. Field lengths, allowed values, filename
-grammar, timestamp handling, and upgrade rules must be specified in tests
-before implementation. A manifest must never contain passwords, tokens,
-private keys, connection strings, signed URLs, or personal data copied from
-the payload.
+The database schema, filename grammar, exact fields, validation rules,
+publication order, and S3 layout are normative in
+[`database-artifact-v1.md`](database-artifact-v1.md). A manifest never contains
+passwords, tokens, private keys, connection strings, signed URLs, hostnames,
+database names, or personal data copied from the payload.
 
 ## Destination and IAM boundary
 
@@ -170,7 +152,8 @@ restore environment's database role.
 
 ## Database backup boundary
 
-Database backup is a planned product capability, but Moodle PHP must not
+Database artifact transfer is implemented on the 0.3 development branch, but
+Moodle PHP must not
 implement a general SQL exporter or execute administrator-supplied shell text.
 
 The initial producer is a dedicated deployment process using the database
@@ -253,11 +236,14 @@ database export, or another operator-controlled producer.
 
 ## Planned delivery order
 
-1. Review and stabilize the database manifest and threat model.
-2. Implement the MariaDB producer and isolated restore gate in
+1. Completed locally: stabilize database artifact v1 and its threat boundary.
+2. Completed locally: implement the MariaDB producer and isolated restore gate
+   in
    `moodle-rescue`.
-3. Add manifest validation, database transfer, audit, and status to the plugin.
-4. Validate AWS IAM separation and recovery from a released plugin ZIP.
+3. Completed locally: add manifest validation, database transfer, audit, and
+   MinIO S3 round-trip recovery.
+4. Next release gate: validate a clean plugin ZIP, upgrade behavior, failure
+   cases, and AWS IAM-separated recovery.
 5. Design coordinated database and content recovery sets.
 6. Implement and validate current-file-pool backup.
 7. Implement and validate the plugin-owned, IAM-first S3 primary-content

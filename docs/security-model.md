@@ -2,8 +2,9 @@
 
 ## Purpose
 
-Secure S3 Storage transfers completed Moodle course backup archives to a
-dedicated Amazon S3 bucket prefix. Its security value is narrow credentials,
+Secure S3 Storage transfers completed Moodle course backup archives and
+validated database backup artifacts to a dedicated Amazon S3 bucket prefix. Its
+security value is narrow credentials,
 strict file and object boundaries, integrity verification, safe retention, and
 recoverability.
 
@@ -12,13 +13,15 @@ be enabled or released.
 
 ## Initial scope
 
-Version 0.2 covers Moodle-generated `.mbz` course backup archives. It does not
-claim to back up an entire Moodle site, the Moodle database, all of
-`moodledata`, or locally installed code.
+Version 0.2 covers Moodle-generated `.mbz` course backup archives. The 0.3
+development branch adds transfer of externally produced MariaDB artifacts under
+the exact v1 manifest contract. It does not yet protect all of `moodledata`,
+configuration, or locally installed code.
 
 ## Protected assets
 
 - Course content and files contained in `.mbz` archives.
+- Site state and personal data contained in completed database artifacts.
 - Personal or sensitive data included by Moodle backup settings.
 - AWS workload credentials supplied by the runtime environment.
 - S3 objects below the configured plugin prefix.
@@ -29,10 +32,13 @@ claim to back up an entire Moodle site, the Moodle database, all of
 
 1. Moodle administrators configure a source directory and S3 destination.
 2. Moodle creates course backups independently of this plugin.
-3. The plugin reads only eligible completed archives from the configured source.
-4. The AWS SDK obtains credentials from its default provider chain.
-5. Amazon S3 stores archives below the dedicated prefix.
-6. Retention may delete only objects previously recognized as plugin-managed.
+3. A deployment-controlled producer creates DB artifacts without exposing DB
+   credentials or dump execution to Moodle PHP.
+4. The plugin reads only eligible completed artifacts from independently
+   configured source directories.
+5. The AWS SDK obtains credentials from its default provider chain.
+6. Amazon S3 stores artifacts below the dedicated prefix.
+7. Restore execution remains outside all web and scheduled transfer paths.
 
 ## Mandatory controls
 
@@ -58,12 +64,24 @@ claim to back up an entire Moodle site, the Moodle database, all of
 - Open files for streaming and handle partial reads and writes completely.
 - Never modify or delete a Moodle-generated archive before a verified upload.
 
+### Database artifacts
+
+- Keep DB credentials and dump execution outside Moodle settings and PHP.
+- Mount the completed-artifact directory read-only in Cron and do not mount it
+  in the Moodle web container.
+- Require the exact artifact v1 fields and reject unknown fields, unsafe names,
+  symlinks, hard-link aliases, traversal, nested paths, and unsupported values.
+- Publish and transfer payload first and manifest last.
+- Re-open by file identity and verify size, modification time, and streamed
+  SHA-256 against the manifest before upload.
+- Keep restore execution outside the plugin and require an isolated empty target.
+
 ### S3 objects
 
 - Normalize region, bucket, and prefix before use.
 - Reject empty buckets, unsafe prefixes, traversal segments, and control bytes.
 - Generate collision-resistant object keys below the configured prefix.
-- Stream uploads; do not load an entire course archive into PHP memory.
+- Stream uploads; do not load an entire backup artifact into PHP memory.
 - Compute SHA-256 locally and request or record S3 integrity metadata.
 - Mark a transfer successful only after remote integrity has been verified.
 - Make retries idempotent and prevent concurrent duplicate transfers.
@@ -105,4 +123,6 @@ claim to back up an entire Moodle site, the Moodle database, all of
 - The final build succeeds against real Amazon S3 using workload credentials.
 - A downloaded `.mbz` matches its original SHA-256 and restores successfully in
   an empty Moodle test environment.
+- A downloaded DB payload and manifest pass local corruption checks, import into
+  a uniquely named empty MariaDB database, and are read by a fresh Moodle image.
 - Install, disable, re-enable, upgrade, and uninstall behavior are verified.

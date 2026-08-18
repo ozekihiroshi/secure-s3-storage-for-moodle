@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0-dev - Unreleased
+
+- Add the strict database artifact v1 manifest and filename contract.
+- Add independently disabled database artifact settings and scheduled transfer.
+- Validate regular non-symlink payload/manifest pairs, exact fields, size,
+  identity, UTC timestamps, and streamed SHA-256 before transfer.
+- Upload and read back the database payload first and `manifest.json` last below
+  `database/v1/YYYY/MM/DD/<artifactid>/`.
+- Keep DB credentials, dump execution, and all restore capability outside Moodle
+  PHP; use the companion deployment's isolated MinIO restore gate.
 ## 0.2.3 - 2026-08-18
 
 - Document the complete Moodle automated-backup, shared-directory, Cron, S3

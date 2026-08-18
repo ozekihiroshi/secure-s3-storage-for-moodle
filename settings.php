@@ -91,5 +91,26 @@ if ($hassiteconfig) {
         0
     ));
 
+    $settings->add(new admin_setting_heading(
+        'tool_secure_s3_storage/databaseheading',
+        get_string('databasebackupsource', 'tool_secure_s3_storage'),
+        get_string('databasebackupsource_desc', 'tool_secure_s3_storage')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/databaseartifactdirectory',
+        get_string('databaseartifactdirectory', 'tool_secure_s3_storage'),
+        get_string('databaseartifactdirectory_desc', 'tool_secure_s3_storage'),
+        '/database-artifacts',
+        PARAM_RAW_TRIMMED
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_secure_s3_storage/databasetransferenabled',
+        get_string('databasetransferenabled', 'tool_secure_s3_storage'),
+        get_string('databasetransferenabled_desc', 'tool_secure_s3_storage'),
+        0
+    ));
+
     $ADMIN->add('tools', $settings);
 }

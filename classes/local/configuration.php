@@ -68,6 +68,25 @@ final class configuration {
      * @return self
      */
     public static function from_plugin_config(): self {
+        return self::from_source_setting('sourcedirectory');
+    }
+
+    /**
+     * Loads configuration for completed database artifacts.
+     *
+     * @return self
+     */
+    public static function from_database_plugin_config(): self {
+        return self::from_source_setting('databaseartifactdirectory');
+    }
+
+    /**
+     * Loads shared S3 settings with one independently configured source directory.
+     *
+     * @param string $sourcesetting Moodle setting containing the source directory
+     * @return self
+     */
+    private static function from_source_setting(string $sourcesetting): self {
         $config = get_config('tool_secure_s3_storage');
 
         $region = strtolower(trim((string)($config->region ?? '')));
@@ -86,7 +105,7 @@ final class configuration {
         }
         $prefix = rtrim($prefix, '/') . '/';
 
-        $source = trim((string)($config->sourcedirectory ?? ''));
+        $source = trim((string)($config->{$sourcesetting} ?? ''));
         if ($source === '' || !str_starts_with($source, '/') || is_link($source)) {
             throw new \invalid_parameter_exception('Invalid backup source configuration.');
         }

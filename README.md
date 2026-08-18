@@ -4,8 +4,8 @@
 [![Moodle Plugin CI](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/ozekihiroshi/secure-s3-storage-for-moodle/actions/workflows/moodle-plugin-ci.yml)
 
 Secure S3 Storage is a Moodle administrator tool for transferring completed
-Moodle course backup archives to Amazon S3 without storing long-lived AWS
-access keys in Moodle.
+Moodle course backup archives and validated database backup artifacts to Amazon
+S3 without storing long-lived AWS access keys in Moodle.
 
 The plugin does not create course backups. Moodle's automated course backup
 system creates `.mbz` archives in an administrator-selected directory, and this
@@ -18,9 +18,11 @@ Moodle automated course backups
         -> Amazon S3
 ```
 
-The first release targets Moodle-generated `.mbz` course backups. It is not a
-complete Moodle site disaster-recovery product: a full site recovery also
-requires the database, `moodledata`, configuration, and locally added code.
+The public 0.2 release targets Moodle-generated `.mbz` course backups. The
+0.3 development branch adds a manifest-validated MariaDB artifact path, while
+keeping dump creation and restore privileges outside Moodle PHP. It is not yet
+a complete site disaster-recovery product: full recovery also requires
+`moodledata`, configuration, and locally added code.
 
 The planned order is database backup, local content backup, native S3 content
 storage without an external plugin dependency, and independent protection of
@@ -31,8 +33,10 @@ course archive transfer are not implemented in version 0.2.
 
 ## Status
 
-Version 0.2.3 is an alpha release candidate for controlled evaluation on Moodle 5.2.
-Transfers remain disabled by default. The scheduled task discovers stable
+The latest public release is 0.2.3 Alpha for controlled course-backup evaluation
+on Moodle 5.2. The `main` branch is 0.3.0-dev and adds database artifact
+transfer. Course and database transfers remain independently disabled by
+default. The course task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
 preserves the local archive.
@@ -98,8 +102,15 @@ process and the process running Cron. The plugin preserves successfully
 transferred local archives, so configure Moodle's automated-backup retention
 settings and monitor local capacity.
 
-See [`docs/operations.md`](docs/operations.md) for the complete setup,
-Docker-volume example, validation commands, and operational checks.
+See [`docs/operations.md`](docs/operations.md) for course-backup setup and
+[`docs/database-artifact-v1.md`](docs/database-artifact-v1.md) for the exact
+database hand-off contract. The reference producer and isolated S3 round-trip
+restore gate live in the companion `moodle-rescue` repository.
+
+For database artifacts, configure the read-only hand-off directory separately
+and enable database transfer only after the producer and isolated restore gate
+pass. The plugin never receives database credentials, invokes `mariadb-dump`,
+or exposes a web restore action.
 
 The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
 `s3:DeleteObject` for incomplete verification cleanup below the configured
@@ -108,9 +119,10 @@ verified objects.
 
 ## Privacy and external service
 
-Course backup archives can contain participant names, identifiers, activity
-content, submissions, grades, and other personal data selected by Moodle's
-backup settings. When transfer is enabled, each eligible archive is sent to the
+Course archives and database backup artifacts can contain participant names,
+identifiers, activity content, submissions, grades, site configuration, and
+other personal data. When the corresponding transfer is enabled, each eligible
+artifact is sent to the
 administrator-configured Amazon S3 or compatible destination. The site operator
 is responsible for the destination's region, access controls, encryption,
 retention, legal basis, and data-processing notices.

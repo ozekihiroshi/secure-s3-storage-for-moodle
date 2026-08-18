@@ -1,6 +1,6 @@
 {
     "name": "ozekihiroshi/moodle-tool_secure_s3_storage",
-    "description": "Transfer verified Moodle course backups to Amazon S3 without storing long-lived AWS keys in Moodle.",
+    "description": "Transfer verified Moodle course and database backup artifacts to Amazon S3 without storing long-lived AWS keys in Moodle.",
     "type": "moodle-tool",
     "license": "GPL-3.0-or-later",
     "require": {

@@ -159,3 +159,17 @@ site also requires independently protected copies of the database,
 `moodledata`, configuration, and locally installed code. Test restoration on a
 separate Moodle environment rather than assuming that an upload alone proves
 recoverability.
+
+## Database artifact path in 0.3 development
+
+Database backup is separate from Moodle automated course backups. The plugin
+does not create a dump. A privileged deployment producer publishes a completed
+payload and manifest into a second hand-off directory; Moodle Cron mounts that
+directory read-only, validates the exact artifact v1 contract, and transfers
+the payload and manifest when the independently disabled database switch is
+enabled.
+
+See [`database-artifact-v1.md`](database-artifact-v1.md) for the contract and
+the companion `moodle-rescue`
+[database backup guide](https://github.com/ozekihiroshi/moodle-rescue/blob/main/docs/database-backup.md)
+for the reference producer and isolated S3 round-trip restore gate.
