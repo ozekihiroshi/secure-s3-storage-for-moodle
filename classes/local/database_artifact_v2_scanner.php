@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace tool_secure_s3_storage\local;
 
@@ -116,14 +124,20 @@ final class database_artifact_v2_scanner {
             throw new \RuntimeException('Manifest fields are invalid.');
         }
 
-        foreach (['schema', 'artifactid', 'type', 'createdat', 'payload', 'sha256', 'format',
-            'compression', 'encryption', 'recoverysetid', 'moodlerelease', 'dbtype'] as $field) {
+        foreach (
+            [
+                'schema', 'artifactid', 'type', 'createdat', 'payload', 'sha256', 'format',
+                'compression', 'encryption', 'recoverysetid', 'moodlerelease', 'dbtype',
+            ] as $field
+        ) {
             if (!is_string($manifest[$field])) {
                 throw new \RuntimeException('Manifest field type is invalid.');
             }
         }
-        if (!is_int($manifest['bytes']) || $manifest['bytes'] < 1 ||
-            !is_int($manifest['moodleversion']) || $manifest['moodleversion'] < 1) {
+        if (
+            !is_int($manifest['bytes']) || $manifest['bytes'] < 1 ||
+            !is_int($manifest['moodleversion']) || $manifest['moodleversion'] < 1
+        ) {
             throw new \RuntimeException('Manifest numeric field is invalid.');
         }
         if (
@@ -161,8 +175,10 @@ final class database_artifact_v2_scanner {
             throw new \RuntimeException('Payload boundary verification failed.');
         }
         $payloadstat = lstat($payloadpath);
-        if ($payloadstat === false || (int)$payloadstat['nlink'] !== 1 ||
-            (int)$payloadstat['size'] !== $manifest['bytes']) {
+        if (
+            $payloadstat === false || (int)$payloadstat['nlink'] !== 1 ||
+            (int)$payloadstat['size'] !== $manifest['bytes']
+        ) {
             throw new \RuntimeException('Payload metadata is invalid.');
         }
 
