@@ -49,12 +49,31 @@ final class transfer_database_backups extends \core\task\scheduled_task {
         }
 
         try {
+            $producer = null;
+            $builtin =
+                \tool_secure_s3_storage\local\database_backup_producer::get_mode() ===
+                \tool_secure_s3_storage\local\database_backup_producer::MODE_BUILTIN;
             try {
+                if ($builtin) {
+                    $producer = new \tool_secure_s3_storage\local\database_backup_producer();
+                    $producer->prepare_directory();
+                }
                 $configuration = \tool_secure_s3_storage\local\configuration::from_database_plugin_config();
             } catch (\Throwable) {
                 $message = get_string('task_database_configuration_error', 'tool_secure_s3_storage');
                 mtrace($message);
                 throw new \RuntimeException($message);
+            }
+
+            if ($producer !== null) {
+                try {
+                    $payload = $producer->produce();
+                    mtrace(get_string('task_database_created', 'tool_secure_s3_storage', $payload));
+                } catch (\Throwable $exception) {
+                    $message = get_string('task_database_production_failed', 'tool_secure_s3_storage');
+                    mtrace($message);
+                    throw new \RuntimeException($message, 0, $exception);
+                }
             }
 
             $manager = new \tool_secure_s3_storage\local\database_transfer_manager();

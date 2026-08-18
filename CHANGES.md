@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 - Unreleased
+
+- Add a plugin-only MariaDB/MySQL database producer using Moodle core DTL XML
+  export inside a repeatable-read, read-only transaction.
+- Keep the external native-dump producer as an advanced isolation mode and
+  preserve that mode automatically when upgrading from 0.3.0.
+- Publish private gzip payloads and strict v2 manifests atomically below
+  `moodledata`, then validate and transfer them through the existing S3 audit
+  path.
+- Add a CLI-only recovery command that validates v2 artifacts, rejects the live
+  database name and non-empty targets, and reads the target password only from
+  an environment variable.
+- Keep database backup disabled by default and prohibit web-triggered live
+  database restore.
 ## 0.3.0 - 2026-08-18
 
 - Add the strict database artifact v1 manifest and filename contract.

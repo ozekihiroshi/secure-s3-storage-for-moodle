@@ -160,16 +160,40 @@ site also requires independently protected copies of the database,
 separate Moodle environment rather than assuming that an upload alone proves
 recoverability.
 
-## Database artifact path in 0.3
+## Database backup modes
 
-Database backup is separate from Moodle automated course backups. The plugin
-does not create a dump. A privileged deployment producer publishes a completed
-payload and manifest into a second hand-off directory; Moodle Cron mounts that
-directory read-only, validates the exact artifact v1 contract, and transfers
-the payload and manifest when the independently disabled database switch is
-enabled.
+Database backup is separate from Moodle automated course backups. In the
+current development version, select a producer under **Secure S3 Storage >
+Database backup artifacts** and then explicitly enable the database scheduled
+task.
 
-See [`database-artifact-v1.md`](database-artifact-v1.md) for the contract and
-the companion `moodle-rescue`
-[database backup guide](https://github.com/ozekihiroshi/moodle-rescue/blob/main/docs/database-backup.md)
-for the reference producer and isolated S3 round-trip restore gate.
+**Built-in Moodle producer** is the standard plugin-only path for
+MariaDB/MySQL. Moodle Cron opens a repeatable-read, read-only transaction, uses
+Moodle core's DTL exporter, compresses and hashes the XML below the private
+`moodledata/tool_secure_s3_storage/database` directory, publishes its manifest
+last, and transfers it in that task run. No database password or executable
+path is added to plugin settings.
+
+**External producer** is the advanced isolation path. A privileged deployment
+producer publishes a completed native payload and manifest into a hand-off
+directory. Moodle Cron reads that directory, validates the exact v1 contract,
+and transfers the pair. This mode remains appropriate for database engines not
+supported by the built-in producer and sites requiring database-native tools or
+strict process separation.
+
+Administrators can use Moodle's **Scheduled tasks** page to inspect the task
+and use **Run now** for an intentional test. Normal operation requires Moodle
+Cron; no pasted shell sequence is required after settings are saved.
+
+Restore only into an empty, isolated database. The built-in DTL artifact
+requires the matching Moodle schema version. Use the bundled CLI-only
+`admin/tool/secure_s3_storage/cli/restore_database.php`; target credentials are
+read from `SECURE_S3_RESTORE_DB*` environment variables and the command refuses
+the live database name or a target containing tables. The plugin never
+overwrites the live database from a web request.
+
+See [`database-producer-modes.md`](database-producer-modes.md),
+[`database-artifact-v1.md`](database-artifact-v1.md), and
+[`database-artifact-v2.md`](database-artifact-v2.md). The companion
+`moodle-rescue` [database backup guide](https://github.com/ozekihiroshi/moodle-rescue/blob/main/docs/database-backup.md)
+documents the reference external producer and isolated restore gate.

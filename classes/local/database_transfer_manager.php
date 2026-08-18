@@ -27,6 +27,9 @@ final class database_transfer_manager {
     /** @var database_artifact_scanner Database artifact scanner. */
     private database_artifact_scanner $scanner;
 
+    /** @var database_artifact_v2_scanner Built-in artifact scanner. */
+    private database_artifact_v2_scanner $v2scanner;
+
     /** @var transfer_repository Transfer audit repository. */
     private transfer_repository $repository;
 
@@ -35,6 +38,7 @@ final class database_transfer_manager {
      */
     public function __construct() {
         $this->scanner = new database_artifact_scanner();
+        $this->v2scanner = new database_artifact_v2_scanner();
         $this->repository = new transfer_repository();
     }
 
@@ -47,6 +51,8 @@ final class database_transfer_manager {
     public function execute(configuration $configuration): array {
         $result = ['found' => 0, 'observed' => 0, 'transferred' => 0, 'failed' => 0];
         $artifacts = $this->scanner->scan($configuration);
+        $artifacts = array_merge($artifacts, $this->v2scanner->scan($configuration));
+        usort($artifacts, static fn(array $a, array $b): int => strcmp($a['filename'], $b['filename']));
         $result['found'] = count($artifacts);
         $gateway = new s3_gateway($configuration);
 
@@ -74,7 +80,7 @@ final class database_transfer_manager {
                 );
 
                 $date = $artifact['compacttime'];
-                $basekey = $configuration->prefix . 'database/v1/' .
+                $basekey = $configuration->prefix . 'database/v' . $artifact['contractversion'] . '/' .
                     substr($date, 0, 4) . '/' . substr($date, 4, 2) . '/' . substr($date, 6, 2) . '/' .
                     $artifact['artifactid'] . '/';
                 $payloadkey = $basekey . $artifact['payload'];
@@ -86,8 +92,8 @@ final class database_transfer_manager {
                     $artifact['payloadbytes'],
                     $payloadhash,
                     $payloadkey,
-                    'application/gzip',
-                    'mariadb-sql-gzip'
+                    $artifact['contenttype'],
+                    $artifact['formatmetadata']
                 );
                 $gateway->upload_and_verify(
                     $manifesthandle,
@@ -95,7 +101,7 @@ final class database_transfer_manager {
                     $manifesthash,
                     $manifestkey,
                     'application/json',
-                    'secure-s3-artifact-manifest-v1'
+                    'secure-s3-artifact-manifest-v' . $artifact['contractversion']
                 );
                 $this->repository->mark_success($recordid);
                 $result['transferred']++;

@@ -31,15 +31,16 @@ could be proved without changing Moodle's database or live file storage.
 ## Current development: database backup
 
 ```text
-MariaDB -> consistent dump -> gzip + manifest -> Secure S3 Storage -> S3
+Standard: Moodle DB -> built-in DTL XML producer -> gzip + manifest -> S3
+Advanced: MariaDB -> external native producer -> gzip + manifest -> S3
 ```
 
-The reference producer now creates a compressed dump without giving
-database-administrator credentials to the Moodle web process. The 0.3
-development plugin validates the exact v1 manifest, uploads and reads back the
-payload and completion manifest, and records the result. A MinIO download into
-a separate volume has been restored into an isolated MariaDB and read by a fresh
-Moodle container.
+The released 0.3 path validates and transfers an external native MariaDB dump
+without giving producer credentials to Moodle PHP. The current development
+branch also provides a plugin-only MariaDB/MySQL producer using a repeatable-
+read, read-only transaction and Moodle's streaming DTL exporter. Both paths
+converge on strict manifest validation, S3 read-back, transfer audit, and an
+isolated recovery boundary.
 
 **Why next:** Course archives do not contain all site state. A database backup is
 the smallest next step toward full-site recovery.

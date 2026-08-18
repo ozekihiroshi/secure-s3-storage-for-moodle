@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'tool_secure_s3_storage';
-$plugin->version = 2026081802;
+$plugin->version = 2026081803;
 $plugin->requires = 2026042000;
 $plugin->supported = [502, 502];
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->release = '0.3.0';
+$plugin->release = '0.4.0-dev';

@@ -69,3 +69,10 @@ $string['task_transfer_course_backups'] = '生成済みコースバックアッ�
 $string['task_transfer_database_backups'] = '生成完了済みDBバックアップ成果物をAmazon S3へ転送する';
 $string['transferenabled'] = '定期転送を有効にする';
 $string['transferenabled_desc'] = '初期状態では無効です。バックアップ元とS3転送先を検証した後にだけ有効にします。';
+
+$string['databaseproducermode'] = 'DBバックアップ生成方式';
+$string['databaseproducermode_desc'] = '標準モードではmoodledata配下にMoodle論理DBバックアップを生成します。外部producerモードでは、権限分離された別プロセスが生成した成果物のみを検証して転送します。方式を変更してもバックアップは自動的に有効になりません。';
+$string['databaseproducermode_builtin'] = 'Moodle内蔵producer（MariaDB/MySQL）';
+$string['databaseproducermode_external'] = '外部producer（高度な権限分離）';
+$string['task_database_created'] = '内蔵DBバックアップ {$a} を生成しました。';
+$string['task_database_production_failed'] = '内蔵DBバックアップの生成に失敗しました。不完全な成果物は公開されていません。';

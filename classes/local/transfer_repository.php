@@ -53,7 +53,7 @@ final class transfer_repository {
                 'timecreated' => $now,
                 'timemodified' => $now,
             ]);
-            return null;
+            return $stabilityseconds === 0 ? (int)$id : null;
         }
 
         if ((int)$record->filesize !== $archive['size'] || (int)$record->filemtime !== $archive['mtime']) {

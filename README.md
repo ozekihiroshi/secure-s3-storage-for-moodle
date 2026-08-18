@@ -18,10 +18,11 @@ Moodle automated course backups
         -> Amazon S3
 ```
 
-Version 0.3 supports Moodle-generated `.mbz` course backups and a
-manifest-validated MariaDB artifact path, while keeping dump creation and
-restore privileges outside Moodle PHP. It is not yet a complete site
-disaster-recovery product: full recovery also requires `moodledata`,
+Version 0.3 supports Moodle-generated `.mbz` course backups and an external,
+manifest-validated MariaDB artifact path. The current development branch adds
+a plugin-only built-in database producer for MariaDB/MySQL while retaining the
+external producer as an advanced isolation option. It is not yet a complete
+site disaster-recovery product: full recovery also requires `moodledata`,
 configuration, and locally added code.
 
 The planned order is database backup, local content backup, native S3 content
@@ -35,7 +36,8 @@ primary S3 content storage are not implemented in version 0.3.
 
 The latest public release is 0.3.0 Alpha for controlled course and database
 artifact evaluation on Moodle 5.2. Course and database transfers remain
-independently disabled by default. The course task discovers stable
+independently disabled by default. Fresh development installations select the
+built-in database producer; 0.3 upgrades retain external mode. The course task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
 preserves the local archive.
@@ -108,10 +110,16 @@ See [`docs/operations.md`](docs/operations.md) for course-backup setup and
 database hand-off contract. The reference producer and isolated S3 round-trip
 restore gate live in the companion `moodle-rescue` repository.
 
-For database artifacts, configure the read-only hand-off directory separately
-and enable database transfer only after the producer and isolated restore gate
-pass. The plugin never receives database credentials, invokes `mariadb-dump`,
-or exposes a web restore action.
+For database backup, choose one producer mode. **Built-in Moodle producer**
+requires only the plugin, MariaDB/MySQL, Moodle Cron, and S3 runtime identity;
+it writes a private Moodle DTL XML artifact below `moodledata` and transfers it
+in the same scheduled run. **External producer** uses the separately mounted
+read-only hand-off directory and keeps native dump credentials and execution
+outside Moodle PHP. Neither mode exposes a web restore action.
+
+See [`docs/database-producer-modes.md`](docs/database-producer-modes.md), the
+external [`docs/database-artifact-v1.md`](docs/database-artifact-v1.md), and
+the built-in [`docs/database-artifact-v2.md`](docs/database-artifact-v2.md).
 
 The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
 `s3:DeleteObject` for incomplete verification cleanup below the configured

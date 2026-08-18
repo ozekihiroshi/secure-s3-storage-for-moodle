@@ -97,6 +97,17 @@ if ($hassiteconfig) {
         get_string('databasebackupsource_desc', 'tool_secure_s3_storage')
     ));
 
+    $settings->add(new admin_setting_configselect(
+        'tool_secure_s3_storage/databaseproducermode',
+        get_string('databaseproducermode', 'tool_secure_s3_storage'),
+        get_string('databaseproducermode_desc', 'tool_secure_s3_storage'),
+        'builtin',
+        [
+            'builtin' => get_string('databaseproducermode_builtin', 'tool_secure_s3_storage'),
+            'external' => get_string('databaseproducermode_external', 'tool_secure_s3_storage'),
+        ]
+    ));
+
     $settings->add(new admin_setting_configtext(
         'tool_secure_s3_storage/databaseartifactdirectory',
         get_string('databaseartifactdirectory', 'tool_secure_s3_storage'),

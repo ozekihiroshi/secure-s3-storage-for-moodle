@@ -77,6 +77,9 @@ final class configuration {
      * @return self
      */
     public static function from_database_plugin_config(): self {
+        if (database_backup_producer::get_mode() === database_backup_producer::MODE_BUILTIN) {
+            return self::from_source_directory(database_backup_producer::get_builtin_directory());
+        }
         return self::from_source_setting('databaseartifactdirectory');
     }
 
@@ -88,6 +91,19 @@ final class configuration {
      */
     private static function from_source_setting(string $sourcesetting): self {
         $config = get_config('tool_secure_s3_storage');
+
+        return self::from_source_directory((string)($config->{$sourcesetting} ?? ''), $config);
+    }
+
+    /**
+     * Loads shared S3 settings with an explicit source directory.
+     *
+     * @param string $source source directory
+     * @param object|null $config previously loaded plugin configuration
+     * @return self
+     */
+    private static function from_source_directory(string $source, ?object $config = null): self {
+        $config ??= get_config('tool_secure_s3_storage');
 
         $region = strtolower(trim((string)($config->region ?? '')));
         if (!preg_match('/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/', $region)) {
@@ -105,7 +121,7 @@ final class configuration {
         }
         $prefix = rtrim($prefix, '/') . '/';
 
-        $source = trim((string)($config->{$sourcesetting} ?? ''));
+        $source = trim($source);
         if ($source === '' || !str_starts_with($source, '/') || is_link($source)) {
             throw new \invalid_parameter_exception('Invalid backup source configuration.');
         }
