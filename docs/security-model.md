@@ -13,13 +13,13 @@ be enabled or released.
 
 ## Initial scope
 
-Version 0.4 covers Moodle-generated `.mbz` course backup archives, externally
-produced MariaDB artifacts under the exact v1 manifest contract, and built-in
-Moodle DTL database artifacts under the v2 contract. The 0.5 development phase
-adds an independently disabled copy of referenced `filedir` objects plus a
-database-matched inventory and completion manifest. This path is not released
-until its isolated recovery gate passes. Configuration and locally installed
-code remain outside plugin scope.
+Version 0.5 covers Moodle-generated `.mbz` course backup archives, externally
+produced MariaDB artifacts under the exact v1 manifest contract, built-in
+Moodle DTL database artifacts under the v2 contract, and an independently
+disabled copy of referenced `filedir` objects with a database-matched inventory
+and completion manifest. The content path passed its isolated recovery gate
+before release. Configuration and locally installed code remain outside plugin
+scope.
 
 ## Protected assets
 

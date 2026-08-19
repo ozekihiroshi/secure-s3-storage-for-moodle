@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0 - Unreleased
+## 0.5.0 - 2026-08-19
 
 - Add an independently disabled, bounded content-object transfer task for the
   existing Moodle `filedir` pool.
@@ -12,8 +12,8 @@
   object has passed S3 read-back verification.
 - Add a CLI-only restore command that rejects the live Moodle data directory,
   requires an empty isolated target, and reconstructs canonical filedir paths.
-- Keep the clean-ZIP matched DB/content restore and corruption rejection as
-  release gates before this feature can leave development status.
+- Require the clean-ZIP matched DB/content restore and corruption-rejection
+  release gates before publishing this alpha feature.
 
 ## 0.4.0 - 2026-08-19
 

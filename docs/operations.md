@@ -197,7 +197,7 @@ See [`database-producer-modes.md`](database-producer-modes.md),
 [`database-artifact-v2.md`](database-artifact-v2.md). The companion
 `moodle-rescue` [database backup guide](https://github.com/ozekihiroshi/moodle-rescue/blob/main/docs/database-backup.md)
 documents the reference external producer and isolated restore gate.
-## Content recovery sets (0.5 development)
+## Content recovery sets (0.5)
 
 This feature protects the existing local `moodledata/filedir` pool; it does not
 move primary Moodle file storage to S3. It is available only with the built-in
