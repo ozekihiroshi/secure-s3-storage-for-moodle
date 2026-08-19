@@ -84,5 +84,11 @@ function xmldb_tool_secure_s3_storage_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026081803, 'tool', 'secure_s3_storage');
     }
 
+    if ($oldversion < 2026081900) {
+        unset_config('contentcursor', 'tool_secure_s3_storage');
+        unset_config('contentrecoveryset', 'tool_secure_s3_storage');
+        upgrade_plugin_savepoint(true, 2026081900, 'tool', 'secure_s3_storage');
+    }
+
     return true;
 }

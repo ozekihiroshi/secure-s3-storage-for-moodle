@@ -197,3 +197,24 @@ See [`database-producer-modes.md`](database-producer-modes.md),
 [`database-artifact-v2.md`](database-artifact-v2.md). The companion
 `moodle-rescue` [database backup guide](https://github.com/ozekihiroshi/moodle-rescue/blob/main/docs/database-backup.md)
 documents the reference external producer and isolated restore gate.
+## Content recovery sets (0.5 development)
+
+This feature protects the existing local `moodledata/filedir` pool; it does not
+move primary Moodle file storage to S3. It is available only with the built-in
+database producer because its sorted content inventory is captured inside the
+same repeatable-read transaction as the database export.
+
+Configure S3 and the built-in database producer first. Leave **Enable scheduled
+content-object transfer** disabled until capacity, API cost, IAM scope, bucket
+immutability or versioning, and an isolated restore procedure have been
+validated. Then choose a bounded batch size and enable the content task. Moodle
+Cron resumes incomplete sets automatically; no pasted command sequence is
+required for normal operation.
+
+A recovery set is complete only when both the database manifest and the content
+completion manifest with the same `recoverysetid` exist remotely. Content
+objects, the local file pool, and successful S3 objects are never deleted by
+the plugin. Restore uses the CLI-only `restore_content.php` against an empty
+isolated directory and must be paired with the matching database artifact.
+
+See [`content-backup-v1.md`](content-backup-v1.md) for the exact contract.

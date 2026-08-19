@@ -118,7 +118,11 @@ final class s3_gateway {
             }
 
             $metadata = array_change_key_case((array)($result['Metadata'] ?? []), CASE_LOWER);
-            if (!isset($metadata['sha256']) || !hash_equals($checksum, (string)$metadata['sha256'])) {
+            if (
+                !isset($metadata['sha256'], $metadata['format']) ||
+                !hash_equals($checksum, (string)$metadata['sha256']) ||
+                !hash_equals($format, (string)$metadata['format'])
+            ) {
                 throw new \RuntimeException('Remote object metadata verification failed.');
             }
 
@@ -146,6 +150,44 @@ final class s3_gateway {
                 unset($cleanupexception);
             }
             throw $exception;
+        }
+    }
+
+    /**
+     * Verifies that a previously uploaded immutable object still exists.
+     *
+     * @param int $size expected object size
+     * @param string $checksum expected lowercase SHA-256
+     * @param string $objectkey normalized plugin-owned object key
+     * @param string $format expected bounded format metadata
+     */
+    public function verify_existing(
+        int $size,
+        string $checksum,
+        string $objectkey,
+        string $format,
+    ): void {
+        if (
+            $size < 1 ||
+            !preg_match('/^[0-9a-f]{64}$/D', $checksum) ||
+            $objectkey === '' ||
+            $format === ''
+        ) {
+            throw new \RuntimeException('Invalid existing-object verification input.');
+        }
+
+        $result = $this->client->headObject([
+            'Bucket' => $this->configuration->bucket,
+            'Key' => $objectkey,
+        ]);
+        $metadata = array_change_key_case((array)($result['Metadata'] ?? []), CASE_LOWER);
+        if (
+            (int)$result['ContentLength'] !== $size ||
+            !isset($metadata['sha256'], $metadata['format']) ||
+            !hash_equals($checksum, (string)$metadata['sha256']) ||
+            !hash_equals($format, (string)$metadata['format'])
+        ) {
+            throw new \RuntimeException('Existing remote object verification failed.');
         }
     }
 

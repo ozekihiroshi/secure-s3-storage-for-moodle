@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 - Unreleased
+
+- Add an independently disabled, bounded content-object transfer task for the
+  existing Moodle `filedir` pool.
+- Capture a content inventory inside the same repeatable-read transaction as
+  each built-in database artifact and link both with one `recoverysetid`.
+- Verify canonical file-pool paths, size, Moodle SHA-1, and SHA-256 before
+  storing immutable objects below deterministic `content/v1/objects/` keys.
+- Publish the inventory and its completion manifest only after every referenced
+  object has passed S3 read-back verification.
+- Add a CLI-only restore command that rejects the live Moodle data directory,
+  requires an empty isolated target, and reconstructs canonical filedir paths.
+- Keep the clean-ZIP matched DB/content restore and corruption rejection as
+  release gates before this feature can leave development status.
+
 ## 0.4.0 - 2026-08-19
 
 - Add a plugin-only MariaDB/MySQL database producer using Moodle core DTL XML

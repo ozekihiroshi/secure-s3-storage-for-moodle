@@ -195,6 +195,7 @@ final class database_artifact_v2_scanner {
             'payloadbytes' => $manifest['bytes'],
             'payloadsha256' => $manifest['sha256'],
             'artifactid' => $manifest['artifactid'],
+            'recoverysetid' => $manifest['recoverysetid'],
             'compacttime' => $compacttime,
             'contractversion' => 2,
             'contenttype' => 'application/gzip',

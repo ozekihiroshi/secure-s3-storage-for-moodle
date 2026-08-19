@@ -58,6 +58,10 @@ final class database_backup_producer {
         }
 
         $directory = $this->prepare_directory();
+        $contentenabled = !empty(get_config(
+            'tool_secure_s3_storage',
+            'contenttransferenabled'
+        ));
 
         require_once($CFG->libdir . '/dtllib.php');
 
@@ -67,16 +71,29 @@ final class database_backup_producer {
         $payload = 'moodle-db-' . $compacttime . '-' . $artifactid . '.xml.gz';
         $payloadpath = $directory . DIRECTORY_SEPARATOR . $payload;
         $manifestpath = $payloadpath . '.manifest.json';
+        $recoverysetid = $compacttime . '-' . $artifactid;
+        $inventory = 'moodle-content-' . $compacttime . '-' . $artifactid . '.jsonl.gz';
+        $inventorypath = $directory . DIRECTORY_SEPARATOR . $inventory;
+        $inventorymanifestpath = $inventorypath . '.manifest.json';
         $token = bin2hex(random_bytes(12));
         $xmltemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.xml.part';
         $gziptemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.xml.gz.part';
         $manifesttemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.manifest.part';
+        $inventorytemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.content.jsonl.part';
+        $inventorygziptemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.content.jsonl.gz.part';
+        $inventorymanifesttemp = $directory . DIRECTORY_SEPARATOR . '.' . $token . '.content.manifest.part';
 
         try {
             $DB->execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
             $DB->execute('SET TRANSACTION READ ONLY');
             $transaction = $DB->start_delegated_transaction();
             try {
+                if ($contentenabled) {
+                    [$objectcount, $contentbytes] = $this->write_content_inventory(
+                        $inventorytemp,
+                        $recoverysetid
+                    );
+                }
                 $exporter = new \file_xml_database_exporter($xmltemp, $DB);
                 $exporter->export_database('Secure S3 Storage built-in database backup');
                 $transaction->allow_commit();
@@ -86,6 +103,13 @@ final class database_backup_producer {
 
             $this->assert_private_regular_file($xmltemp);
             [$bytes, $sha256] = $this->compress_and_hash($xmltemp, $gziptemp);
+            if ($contentenabled) {
+                $this->assert_private_regular_file($inventorytemp);
+                [$inventorybytes, $inventorysha256] = $this->compress_and_hash(
+                    $inventorytemp,
+                    $inventorygziptemp
+                );
+            }
 
             $manifest = [
                 'schema' => self::SCHEMA,
@@ -98,7 +122,7 @@ final class database_backup_producer {
                 'format' => 'moodle-dtl-xml',
                 'compression' => 'gzip',
                 'encryption' => 'none',
-                'recoverysetid' => $compacttime . '-' . $artifactid,
+                'recoverysetid' => $recoverysetid,
                 'moodleversion' => (int)$CFG->version,
                 'moodlerelease' => (string)$CFG->release,
                 'dbtype' => (string)$CFG->dbtype,
@@ -110,21 +134,128 @@ final class database_backup_producer {
             }
             chmod($manifesttemp, 0600);
 
+            if ($contentenabled) {
+                $inventorymanifest = [
+                    'schema' => 'tool_secure_s3_storage.content-recovery/v1',
+                    'type' => 'content',
+                    'createdat' => $created->format('Y-m-d\TH:i:s\Z'),
+                    'recoverysetid' => $recoverysetid,
+                    'databaseartifactid' => $artifactid,
+                    'inventory' => $inventory,
+                    'inventorybytes' => $inventorybytes,
+                    'inventorysha256' => $inventorysha256,
+                    'objectcount' => $objectcount,
+                    'contentbytes' => $contentbytes,
+                    'hashalgorithm' => 'sha1',
+                    'compression' => 'gzip',
+                ];
+                $inventoryjson = json_encode(
+                    $inventorymanifest,
+                    JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+                ) . "\n";
+                if (
+                    file_put_contents($inventorymanifesttemp, $inventoryjson, LOCK_EX) !==
+                    strlen($inventoryjson)
+                ) {
+                    throw new \RuntimeException('Unable to write the content recovery manifest.');
+                }
+                chmod($inventorymanifesttemp, 0600);
+            }
+
             if (!rename($gziptemp, $payloadpath)) {
                 throw new \RuntimeException('Unable to publish the database artifact payload.');
+            }
+            if ($contentenabled && !rename($inventorygziptemp, $inventorypath)) {
+                throw new \RuntimeException('Unable to publish the content inventory payload.');
             }
             if (!rename($manifesttemp, $manifestpath)) {
                 throw new \RuntimeException('Unable to publish the database artifact manifest.');
             }
+            if ($contentenabled && !rename($inventorymanifesttemp, $inventorymanifestpath)) {
+                throw new \RuntimeException('Unable to publish the content recovery manifest.');
+            }
 
             return $payload;
         } finally {
-            foreach ([$xmltemp, $gziptemp, $manifesttemp] as $temporary) {
+            foreach (
+                [
+                    $xmltemp,
+                    $gziptemp,
+                    $manifesttemp,
+                    $inventorytemp,
+                    $inventorygziptemp,
+                    $inventorymanifesttemp,
+                ] as $temporary
+            ) {
                 if (is_file($temporary) && !is_link($temporary)) {
                     unlink($temporary);
                 }
             }
         }
+    }
+
+    /**
+     * Writes the referenced content-object inventory inside the DB snapshot.
+     *
+     * @param string $destination private temporary JSON Lines file
+     * @param string $recoverysetid shared database/content recovery-set identifier
+     * @return array{0: int, 1: int} object count and total uncompressed content bytes
+     */
+    private function write_content_inventory(string $destination, string $recoverysetid): array {
+        global $DB;
+
+        $handle = fopen($destination, 'xb');
+        if ($handle === false) {
+            throw new \RuntimeException('Unable to create the content inventory.');
+        }
+        chmod($destination, 0600);
+
+        $objectcount = 0;
+        $contentbytes = 0;
+        try {
+            $header = json_encode([
+                'schema' => 'tool_secure_s3_storage.content-inventory/v1',
+                'recoverysetid' => $recoverysetid,
+            ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+            if (fwrite($handle, $header) !== strlen($header)) {
+                throw new \RuntimeException('Unable to write the content inventory header.');
+            }
+
+            $sql = "SELECT contenthash, MIN(filesize) AS minfilesize, MAX(filesize) AS filesize
+                      FROM {files}
+                     WHERE filesize > 0
+                  GROUP BY contenthash
+                  ORDER BY contenthash";
+            $recordset = $DB->get_recordset_sql($sql);
+            try {
+                foreach ($recordset as $record) {
+                    $contenthash = (string)$record->contenthash;
+                    $filesize = (int)$record->filesize;
+                    if (
+                        !preg_match('/^[0-9a-f]{40}$/D', $contenthash) ||
+                        $filesize < 1 ||
+                        (int)$record->minfilesize !== $filesize
+                    ) {
+                        throw new \RuntimeException('Invalid content metadata in the database snapshot.');
+                    }
+                    $line = json_encode([
+                        'contenthash' => $contenthash,
+                        'filesize' => $filesize,
+                    ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+                    if (fwrite($handle, $line) !== strlen($line)) {
+                        throw new \RuntimeException('Unable to write the content inventory.');
+                    }
+                    $objectcount++;
+                    $contentbytes += $filesize;
+                }
+            } finally {
+                $recordset->close();
+            }
+        } finally {
+            fclose($handle);
+        }
+
+        return [$objectcount, $contentbytes];
     }
 
     /**

@@ -84,6 +84,17 @@ final class configuration {
     }
 
     /**
+     * Loads configuration for the existing Moodle content file pool.
+     *
+     * @return self
+     */
+    public static function from_content_pool(): self {
+        global $CFG;
+
+        return self::from_source_directory($CFG->dataroot . DIRECTORY_SEPARATOR . 'filedir');
+    }
+
+    /**
      * Loads shared S3 settings with one independently configured source directory.
      *
      * @param string $sourcesetting Moodle setting containing the source directory

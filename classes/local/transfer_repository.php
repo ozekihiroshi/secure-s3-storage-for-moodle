@@ -28,6 +28,43 @@ final class transfer_repository {
     private const TABLE = 'tool_secure_s3_storage_xfer';
 
     /**
+     * Reports whether one source was uploaded and remotely verified.
+     *
+     * @param string $sourcehash namespaced source identity
+     * @return bool
+     */
+    public function is_success(string $sourcehash): bool {
+        global $DB;
+
+        if (!preg_match('/^[0-9a-f]{64}$/D', $sourcehash)) {
+            return false;
+        }
+        return $DB->record_exists(self::TABLE, [
+            'sourcehash' => $sourcehash,
+            'status' => 'success',
+        ]);
+    }
+
+    /**
+     * Returns a completed transfer record for one source.
+     *
+     * @param string $sourcehash namespaced source identity
+     * @return \stdClass|null
+     */
+    public function get_success(string $sourcehash): ?\stdClass {
+        global $DB;
+
+        if (!preg_match('/^[0-9a-f]{64}$/D', $sourcehash)) {
+            return null;
+        }
+        $record = $DB->get_record(self::TABLE, [
+            'sourcehash' => $sourcehash,
+            'status' => 'success',
+        ]);
+        return $record ?: null;
+    }
+
+    /**
      * Observes an archive and reports whether it has remained stable long enough.
      *
      * @param array $archive archive data containing path, source hash, filename, size, and modification time

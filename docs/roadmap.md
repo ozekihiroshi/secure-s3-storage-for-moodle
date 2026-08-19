@@ -28,36 +28,42 @@ downloaded archive restored as a separate Moodle course.
 **Why first:** Moodle already creates the archive, so S3 transfer and recovery
 could be proved without changing Moodle's database or live file storage.
 
-## Current development: database backup
+## Current: database backup
 
 ```text
 Standard: Moodle DB -> built-in DTL XML producer -> gzip + manifest -> S3
 Advanced: MariaDB -> external native producer -> gzip + manifest -> S3
 ```
 
-The released 0.3 path validates and transfers an external native MariaDB dump
-without giving producer credentials to Moodle PHP. The current development
-branch also provides a plugin-only MariaDB/MySQL producer using a repeatable-
-read, read-only transaction and Moodle's streaming DTL exporter. Both paths
-converge on strict manifest validation, S3 read-back, transfer audit, and an
-isolated recovery boundary.
+Version 0.4 validates and transfers an external native MariaDB dump without
+giving producer credentials to Moodle PHP and provides a plugin-only
+MariaDB/MySQL producer using a repeatable-read, read-only transaction and
+Moodle's streaming DTL exporter. Both paths converge on strict manifest
+validation, S3 read-back, transfer audit, and an isolated recovery boundary.
 
 **Why next:** Course archives do not contain all site state. A database backup is
 the smallest next step toward full-site recovery.
 
-**Remaining release gate:** A clean plugin ZIP must pass upgrade, invalid-manifest,
-remote-corruption, MinIO restore, and AWS IAM-separated recovery tests before
-database transfer is released.
+**Release evidence:** A clean plugin ZIP passes upgrade, invalid-manifest,
+remote-corruption, MinIO restore, and AWS IAM-separated transfer tests.
 
-## Then: content backup
+## Current development: content backup
 
 ```text
 moodledata/filedir -> consistent snapshot -> Secure S3 Storage -> S3 backup
 ```
 
-Database and content artifacts will share a recovery-set identifier. The first
-implementation protects the existing local content pool and does not change
-Moodle's normal file storage.
+The built-in database producer captures a sorted inventory of non-empty Moodle
+content hashes inside the same repeatable-read transaction as the DTL export.
+The database artifact and content inventory share one recovery-set identifier.
+The content task verifies each canonical file-pool path, size, Moodle SHA-1, and
+SHA-256 before uploading to a deterministic immutable key and reading it back.
+It publishes the inventory and completion manifest only after every referenced
+object succeeds.
+
+The task never deletes local or remote content and does not change Moodle's
+normal file storage. It remains independently disabled by default until the
+clean-ZIP matched DB/content restore and corruption rejection gate passes.
 
 **Why after the database:** Moodle stores file meaning and references in the
 database. Content objects alone cannot reconstruct the site.

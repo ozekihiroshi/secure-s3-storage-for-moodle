@@ -43,4 +43,13 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        'classname' => '\\tool_secure_s3_storage\\task\\transfer_content_objects',
+        'blocking' => 1,
+        'minute' => '*/10',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

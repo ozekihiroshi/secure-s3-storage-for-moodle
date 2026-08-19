@@ -9,8 +9,8 @@ companion `moodle-rescue` reference deployment.
 
 Version 0.3 implements the course archive path in
 [`operations.md`](operations.md) and the database artifact v1 validator and
-transfer path. Content artifacts and primary S3 content storage remain design
-targets.
+transfer path. Database-matched content recovery sets are under development;
+primary S3 content storage remains a later design target.
 
 The current normative controls remain in
 [`security-model.md`](security-model.md). Before another artifact type is
@@ -91,7 +91,7 @@ runbook. These materials are not plugin-managed backup artifacts.
 | --- | --- | --- | --- | --- | --- |
 | Course archive | Secure S3 Storage and Moodle automated backup | Moodle backup task | Secure S3 Storage Cron task | Moodle restore CLI or UI under administrator control | Moodle course backup access and dedicated course S3 prefix |
 | Database dump | Secure S3 Storage backup policy; deployment supplies the engine adapter | Dedicated database backup process | Secure S3 Storage Cron task | Offline or isolated database recovery process | Narrow dump credentials and dedicated database S3 prefix |
-| Content backup | Secure S3 Storage backup policy; deployment supplies the snapshot adapter | Coordinated filesystem snapshot process | Secure S3 Storage Cron task | Isolated content recovery process | Content-pool read access and dedicated content-backup S3 prefix |
+| Content backup | Secure S3 Storage | Built-in bounded contenthash scanner; optional external snapshot for advanced isolation | Secure S3 Storage Cron task | Isolated matched DB/content recovery process | Moodle file-pool read access and dedicated content-backup S3 prefix |
 | Primary S3 content storage | Secure S3 Storage planned feature | Moodle File API and the plugin-owned S3 filesystem | Not a backup transfer | Moodle through the same plugin | Dedicated primary-content bucket access |
 | Configuration and secrets | Deployment operator | Deployment operator | Operator-selected encrypted configuration system | Deployment operator | Kept outside Moodle, plugin storage, release ZIPs, and Git |
 | Custom code and container definitions | Deployment operator | Reproducible build and source control | Release/deployment system | Rebuild and redeploy process | Read-only releases and source control |
@@ -181,10 +181,11 @@ Moodle's database gives content-addressed file objects their meaning. Database
 and content recovery therefore require a coordinated recovery set.
 
 The first content phase protects an existing `moodledata/filedir` without
-changing primary storage. Its producer must use a maintenance or quiescence
-window, or a storage snapshot method whose consistency properties are
-documented. Database and content artifacts that belong together share a
-`recoverysetid`.
+changing primary storage. The standard plugin-only path incrementally copies
+canonical contenthash objects and never deletes either side. A matched inventory
+captured with the database artifact supplies recovery completeness; an external
+filesystem snapshot remains an optional advanced isolation path. Database and
+content artifacts that belong together share a `recoverysetid`.
 
 Moving the live file pool to S3 is a later Secure S3 Storage feature. It will
 implement the required Moodle File System API adapter inside this plugin and

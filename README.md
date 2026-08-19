@@ -20,10 +20,12 @@ Moodle automated course backups
 
 Version 0.4 supports Moodle-generated `.mbz` course backups and both a
 plugin-only built-in database producer for MariaDB/MySQL and an external,
-manifest-validated database artifact path for advanced isolation. It is not
-yet a complete
-site disaster-recovery product: full recovery also requires `moodledata`,
-configuration, and locally added code.
+manifest-validated database artifact path for advanced isolation. The 0.5
+development branch adds independently disabled protection of referenced
+`moodledata/filedir` objects and links its inventory to a built-in database
+artifact as one recovery set. This development feature remains disabled until
+the clean-ZIP matched restore gate passes. Configuration and locally added code
+remain separate operator responsibilities.
 
 The planned order is database backup, local content backup, native S3 content
 storage without an external plugin dependency, and independent protection of
@@ -121,6 +123,8 @@ outside Moodle PHP. Neither mode exposes a web restore action.
 See [`docs/database-producer-modes.md`](docs/database-producer-modes.md), the
 external [`docs/database-artifact-v1.md`](docs/database-artifact-v1.md), and
 the built-in [`docs/database-artifact-v2.md`](docs/database-artifact-v2.md).
+The development content recovery-set contract is documented in
+[`docs/content-backup-v1.md`](docs/content-backup-v1.md).
 
 The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
 `s3:DeleteObject` for incomplete verification cleanup below the configured
@@ -129,7 +133,7 @@ verified objects.
 
 ## Privacy and external service
 
-Course archives and database backup artifacts can contain participant names,
+Course archives, database artifacts, and referenced content objects can contain participant names,
 identifiers, activity content, submissions, grades, site configuration, and
 other personal data. When the corresponding transfer is enabled, each eligible
 artifact is sent to the

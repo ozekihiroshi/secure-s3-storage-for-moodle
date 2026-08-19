@@ -123,5 +123,26 @@ if ($hassiteconfig) {
         0
     ));
 
+    $settings->add(new admin_setting_heading(
+        'tool_secure_s3_storage/contentheading',
+        get_string('contentbackup', 'tool_secure_s3_storage'),
+        get_string('contentbackup_desc', 'tool_secure_s3_storage')
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_secure_s3_storage/contentbatchsize',
+        get_string('contentbatchsize', 'tool_secure_s3_storage'),
+        get_string('contentbatchsize_desc', 'tool_secure_s3_storage'),
+        100,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_secure_s3_storage/contenttransferenabled',
+        get_string('contenttransferenabled', 'tool_secure_s3_storage'),
+        get_string('contenttransferenabled_desc', 'tool_secure_s3_storage'),
+        0
+    ));
+
     $ADMIN->add('tools', $settings);
 }

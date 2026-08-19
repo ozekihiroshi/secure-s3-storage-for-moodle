@@ -27,6 +27,12 @@ manifest is published last and contains exactly:
       "dbtype": "mariadb"
     }
 
+When content recovery is enabled, the same repeatable-read transaction also
+emits the content inventory documented in
+[`content-backup-v1.md`](content-backup-v1.md). Its manifest uses this exact
+`recoverysetid`. The database manifest schema remains unchanged; when content
+recovery is disabled, the database artifact remains a valid DB-only artifact.
+
 The scanner rejects unknown fields, invalid names or relationships, links,
 hard-linked files, changed file identity or metadata, incorrect byte counts,
 and incorrect streamed SHA-256 values. S3 objects are stored under
