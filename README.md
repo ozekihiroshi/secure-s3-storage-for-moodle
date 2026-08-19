@@ -18,10 +18,10 @@ Moodle automated course backups
         -> Amazon S3
 ```
 
-Version 0.3 supports Moodle-generated `.mbz` course backups and an external,
-manifest-validated MariaDB artifact path. The current development branch adds
-a plugin-only built-in database producer for MariaDB/MySQL while retaining the
-external producer as an advanced isolation option. It is not yet a complete
+Version 0.4 supports Moodle-generated `.mbz` course backups and both a
+plugin-only built-in database producer for MariaDB/MySQL and an external,
+manifest-validated database artifact path for advanced isolation. It is not
+yet a complete
 site disaster-recovery product: full recovery also requires `moodledata`,
 configuration, and locally added code.
 
@@ -30,14 +30,15 @@ storage without an external plugin dependency, and independent protection of
 that primary S3 content. See [`docs/roadmap.md`](docs/roadmap.md) for the
 reason and completion condition for each step. Detailed boundaries are in
 [`docs/backup-architecture.md`](docs/backup-architecture.md). Content backup and
-primary S3 content storage are not implemented in version 0.3.
+primary S3 content storage are not implemented in version 0.4.
 
 ## Status
 
-The latest public release is 0.3.0 Alpha for controlled course and database
-artifact evaluation on Moodle 5.2. Course and database transfers remain
-independently disabled by default. Fresh development installations select the
-built-in database producer; 0.3 upgrades retain external mode. The course task discovers stable
+The latest public release is 0.4.0 Alpha for controlled course and database
+backup evaluation on Moodle 5.2. Course and database transfers remain
+independently disabled by default. Fresh installations select the built-in
+database producer; upgrades from 0.3.0 retain external mode until an
+administrator explicitly changes it. The course task discovers stable
 top-level `.mbz` files, streams them to S3, reads them back to verify their
 SHA-256 digest and size, records transfer history, suppresses duplicates, and
 preserves the local archive.

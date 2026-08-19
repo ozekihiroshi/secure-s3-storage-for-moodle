@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 - Unreleased
+## 0.4.0 - 2026-08-19
 
 - Add a plugin-only MariaDB/MySQL database producer using Moodle core DTL XML
   export inside a repeatable-read, read-only transaction.
