@@ -26,10 +26,22 @@
  */
 
 define('CLI_SCRIPT', true);
+define('ABORT_AFTER_CONFIG', true);
 
 require(__DIR__ . '/../../../../../config.php');
+require_once($CFG->libdir . '/setuplib.php');
+require_once($CFG->libdir . '/dmllib.php');
+require_once($CFG->libdir . '/moodlelib.php');
+require_once($CFG->libdir . '/sessionlib.php');
 require_once($CFG->libdir . '/clilib.php');
+require_once($CFG->libdir . '/dml/moodle_database.php');
 require_once($CFG->libdir . '/dtllib.php');
+
+$version = null;
+require($CFG->dirroot . '/version.php');
+$moodlecodeversion = (int)$version;
+$CFG->version = $moodlecodeversion;
+unset($version);
 
 [$options, $unrecognized] = cli_get_params(
     ['manifest' => null, 'help' => false],
@@ -103,7 +115,7 @@ try {
 } catch (Throwable) {
     cli_error('Artifact manifest or payload validation failed.');
 }
-if ($artifact['moodleversion'] !== (int)$CFG->version) {
+if ($artifact['moodleversion'] !== $moodlecodeversion) {
     cli_error('Artifact Moodle schema version does not match this Moodle code version.');
 }
 

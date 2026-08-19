@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1 - 2026-08-19
+
+- Keep the CLI-only DTL restore disconnected from the configured Moodle
+  database while loading the minimum core libraries required for import.
+- Compare recovery artifacts with the installed Moodle code build and pass the
+  same verified build to the DTL importer.
+
 ## 0.5.0 - 2026-08-19
 
 - Add an independently disabled, bounded content-object transfer task for the
