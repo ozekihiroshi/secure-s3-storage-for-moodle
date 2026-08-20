@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0 - 2026-08-20
+
+- Add an administrator-only operational status page for effective S3 settings,
+  task schedules, previous and next runs, failure delay, audit counts, and the
+  twenty most recent transfer records.
+- Queue course, database, and content transfers as deduplicated Moodle adhoc
+  tasks instead of executing backup work inside a web request.
+- Link to Moodle's standard scheduled-task editor rather than maintaining a
+  second schedule configuration.
+- Document deletion ownership: Moodle controls local course retention, S3
+  Lifecycle controls remote retention, and the plugin deletes neither verified
+  S3 objects nor Moodle filedir content.
+
 ## 0.5.1 - 2026-08-19
 
 - Keep the CLI-only DTL restore disconnected from the configured Moodle

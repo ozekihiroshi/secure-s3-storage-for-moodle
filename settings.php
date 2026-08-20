@@ -144,5 +144,27 @@ if ($hassiteconfig) {
         0
     ));
 
+    $settings->add(new admin_setting_heading(
+        'tool_secure_s3_storage/operationsheading',
+        get_string('operations', 'tool_secure_s3_storage'),
+        get_string('operations_desc', 'tool_secure_s3_storage')
+    ));
+
+    $settings->add(new admin_setting_description(
+        'tool_secure_s3_storage/operationslink',
+        get_string('operationsstatus', 'tool_secure_s3_storage'),
+        \html_writer::link(
+            new \moodle_url('/admin/tool/secure_s3_storage/status.php'),
+            get_string('openoperationsstatus', 'tool_secure_s3_storage')
+        )
+    ));
+
     $ADMIN->add('tools', $settings);
 }
+
+$ADMIN->add('tools', new admin_externalpage(
+    'tool_secure_s3_storage_status',
+    get_string('operationsstatus', 'tool_secure_s3_storage'),
+    new moodle_url('/admin/tool/secure_s3_storage/status.php'),
+    'tool/secure_s3_storage:manage'
+));

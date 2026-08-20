@@ -18,26 +18,24 @@ Moodle automated course backups
         -> Amazon S3
 ```
 
-Version 0.4 supports Moodle-generated `.mbz` course backups and both a
-plugin-only built-in database producer for MariaDB/MySQL and an external,
-manifest-validated database artifact path for advanced isolation. The 0.5
-development branch adds independently disabled protection of referenced
-`moodledata/filedir` objects and links its inventory to a built-in database
-artifact as one recovery set. This development feature remains disabled until
-the clean-ZIP matched restore gate passes. Configuration and locally added code
-remain separate operator responsibilities.
+Version 0.6 supports Moodle-generated `.mbz` course backups, a plugin-only
+built-in database producer for MariaDB/MySQL, an external artifact path for
+advanced isolation, and independently disabled protection of referenced
+`moodledata/filedir` objects. Database and content inventories share one
+recovery-set identifier and pass a clean-ZIP isolated restore gate.
 
 The planned order is database backup, local content backup, native S3 content
 storage without an external plugin dependency, and independent protection of
 that primary S3 content. See [`docs/roadmap.md`](docs/roadmap.md) for the
 reason and completion condition for each step. Detailed boundaries are in
-[`docs/backup-architecture.md`](docs/backup-architecture.md). Content backup and
-primary S3 content storage are not implemented in version 0.4.
+[`docs/backup-architecture.md`](docs/backup-architecture.md). Native S3 primary
+content storage remains a separate future phase and is not enabled by this
+backup plugin.
 
 ## Status
 
-The latest public release is 0.4.0 Alpha for controlled course and database
-backup evaluation on Moodle 5.2. Course and database transfers remain
+The current development version is 0.6.0 Alpha for controlled course, database,
+and content recovery evaluation on Moodle 5.2. All transfer types remain
 independently disabled by default. Fresh installations select the built-in
 database producer; upgrades from 0.3.0 retain external mode until an
 administrator explicitly changes it. The course task discovers stable
@@ -103,6 +101,13 @@ archives do not contain `vendor/` and are not installable release packages.
    stability interval.
 5. Enable scheduled transfer only after validating the destination permissions.
 
+After saving, open **Secure S3 Storage operational status** under Admin tools.
+It shows the effective non-secret destination, each task's cron expression,
+previous and next execution, failure delay, aggregate audit status, and recent
+records. **Queue now** submits a deduplicated background task to Moodle Cron;
+it does not perform backup work in the browser request. Use Moodle's standard
+**Scheduled tasks** page to change execution times.
+
 The backup directory must refer to the same storage from both the Moodle web
 process and the process running Cron. The plugin preserves successfully
 transferred local archives, so configure Moodle's automated-backup retention
@@ -130,6 +135,11 @@ The initial IAM policy should allow `s3:PutObject`, `s3:GetObject`, and
 `s3:DeleteObject` for incomplete verification cleanup below the configured
 prefix. The plugin does not currently perform retention or delete successfully
 verified objects.
+
+S3 retention belongs in bucket Versioning and Lifecycle rules limited to the
+dedicated prefix. This plugin does not delete verified remote objects or local
+`filedir` content. Moodle automated-backup settings remain responsible for
+local course archive retention.
 
 ## Privacy and external service
 

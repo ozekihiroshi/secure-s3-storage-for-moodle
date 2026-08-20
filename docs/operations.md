@@ -147,12 +147,37 @@ A successful run reports that the archive was transferred and verified. Also
 confirm the object below the configured S3 prefix and retain a documented
 restore test appropriate for the site's recovery plan.
 
+## Operational status and manual queueing
+
+Open **Site administration > Plugins > Admin tools > Secure S3 Storage
+operational status** after saving plugin settings. The page is restricted to
+the plugin management capability and shows only non-secret configuration,
+scheduled-task timing, transfer audit totals, and the twenty most recent audit
+records.
+
+Use **Queue now** to request an intentional course, database, or content run.
+The action requires a valid Moodle session key, refuses disabled transfer
+types, and queues one deduplicated adhoc task. Moodle Cron performs the work in
+the background with the same lock and fail-closed checks as scheduled runs.
+The web request never performs a database export or S3 transfer.
+
+Use the linked Moodle **Scheduled tasks** page to edit execution times. This
+plugin deliberately does not maintain a second schedule setting. A queued
+manual action and a scheduled action cannot transfer the same domain
+concurrently because the existing Moodle lock remains authoritative.
+
 ## Retention and recovery boundary
 
 The plugin preserves the local `.mbz` after a successful transfer and does not
-delete verified S3 objects. Configure Moodle's local automated-backup retention
-and an S3 lifecycle policy according to the site's requirements, and monitor
-both storage locations.
+delete verified S3 objects. Moodle automated-backup settings own local course
+archive retention. Local database artifacts remain preserved until a separately
+tested operator procedure removes them. The plugin never deletes local
+`moodledata/filedir` objects. Configure S3 Versioning and Lifecycle rules below
+the dedicated prefix for remote retention, and monitor all storage locations.
+
+A successful transfer is evidence that the object was written and read back;
+it is not authorization to delete either copy. Do not add automatic local or
+remote deletion without a separate corruption, concurrency, and recovery gate.
 
 Course `.mbz` archives are not a complete Moodle site backup. Recovering a full
 site also requires independently protected copies of the database,
