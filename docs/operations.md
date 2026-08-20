@@ -179,6 +179,13 @@ A successful transfer is evidence that the object was written and read back;
 it is not authorization to delete either copy. Do not add automatic local or
 remote deletion without a separate corruption, concurrency, and recovery gate.
 
+The initial bucket-side policy is 30 days for course archives, database
+artifacts, and content recovery-set metadata, with indefinite retention for
+shared content-addressed objects. See
+[`aws-lifecycle.md`](aws-lifecycle.md) for the non-overlapping key filters,
+Versioning semantics, IAM boundary, and staged activation procedure. Do not
+apply a 30-day rule to `content/v1/objects/`.
+
 Course `.mbz` archives are not a complete Moodle site backup. Recovering a full
 site also requires independently protected copies of the database,
 `moodledata`, configuration, and locally installed code. Test restoration on a
