@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.1 - 2026-08-20
+
+- Record the successful EC2 instance-role validation of database and
+  database-matched Moodle content transfer to Amazon S3.
+- Document the isolated database and `filedir` recovery rehearsal that rejects
+  a checksum-corrupt inventory before restoring the verified recovery set.
+- Establish the initial S3 Versioning and Lifecycle baseline: 30-day recovery
+  metadata retention, no automatic expiry for shared content objects, and
+  seven-day cleanup of incomplete multipart uploads.
+- Keep runtime behavior, default-disabled database and content transfers, and
+  alpha maturity unchanged from version 0.6.0.
+
 ## 0.6.0 - 2026-08-20
 
 - Add an administrator-only operational status page for effective S3 settings,
