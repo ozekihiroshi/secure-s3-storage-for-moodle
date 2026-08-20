@@ -34,7 +34,7 @@ backup plugin.
 
 ## Status
 
-The current development version is 0.6.0 Alpha for controlled course, database,
+The current development version is 0.6.1 Alpha for controlled course, database,
 and content recovery evaluation on Moodle 5.2. All transfer types remain
 independently disabled by default. Fresh installations select the built-in
 database producer; upgrades from 0.3.0 retain external mode until an
