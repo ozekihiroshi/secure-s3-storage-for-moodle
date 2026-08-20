@@ -139,7 +139,9 @@ verified objects.
 S3 retention belongs in bucket Versioning and Lifecycle rules limited to the
 dedicated prefix. This plugin does not delete verified remote objects or local
 `filedir` content. Moodle automated-backup settings remain responsible for
-local course archive retention.
+local course archive retention. The documented initial remote policy keeps
+recovery sets for 30 days while retaining shared content-addressed objects
+indefinitely; see [`docs/aws-lifecycle.md`](docs/aws-lifecycle.md).
 
 ## Privacy and external service
 
